@@ -1,0 +1,3 @@
+import 'jupiter-engine-clojure.test'
+import 'jupiter-plugin-gradle'
+

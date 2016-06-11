@@ -1,0 +1,28 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.ajoberstar:semver-vcs-gradle-grgit:0.1.0'
+    }
+}
+
+apply plugin: 'org.ajoberstar.semver-vcs-grgit'
+
+allprojects {
+    group = 'org.ajoberstar.jupiter'
+
+    plugins.withId('java') {
+        repositories {
+            jcenter()
+        }
+    }
+
+    plugins.withId('maven-publish') {
+        publishing {
+            repositories {
+                mavenLocal()
+            }
+        }
+    }
+}

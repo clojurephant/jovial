@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+configurations.all {
+    exclude group: 'org.codehaus.groovy'
+}
+
+dependencies {
+    compile gradleApi()
+
+    testCompile 'junit:junit:4.12'
+    testCompile gradleTestKit()
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from tasks.javadoc.outputs.files
+}
+
+publishing {
+    publications {
+        main(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
