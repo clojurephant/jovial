@@ -5,6 +5,9 @@ plugins {
 
 dependencies {
     compile 'org.junit:junit-engine-api:5.0.0-ALPHA'
+    compile 'org.clojure:clojure:1.9.0-alpha5'
+    compile 'org.clojure:tools.namespace:0.2.11'
+    compile 'org.apache.commons:commons-lang3:3.4'
 
     testCompile 'junit:junit:4.12'
 }
