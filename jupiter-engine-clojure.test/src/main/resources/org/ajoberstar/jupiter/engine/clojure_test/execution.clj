@@ -52,15 +52,10 @@
 
 (defmethod listener-report :default [_] nil)
 
-(defn filtering-test-var [real-test-var]
-  (fn [v]
-    (if (contains? *descs* v)
-      (real-test-var v))))
-
 (defn execute-tests [^EngineDescriptor descriptor ^EngineExecutionListener listener]
   (binding [*listener* listener
             *descs* (descriptors descriptor)
             *current-desc* (atom nil)
-            test/test-var (filtering-test-var test/test-var)
             test/report listener-report]
-    (test/run-all-tests)))
+    (let [selected-vars (keys *descs*)]
+      (test/test-vars selected-vars))))
