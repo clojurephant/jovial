@@ -1,38 +1,53 @@
 (ns org.ajoberstar.jupiter.engine.clojure-test.discovery
-  (:require [clojure.test :as test]
-            [clojure.tools.namespace.find :refer [find-namespaces]]))
+  (:require [clojure.tools.namespace.find :refer [find-namespaces]])
+  (:import (clojure.lang Var Symbol Namespace)
+           (java.io File)
+           (java.nio.file Path)
+           (org.ajoberstar.jupiter.engine.clojure_test ClojureVarSource ClojureVarTestDescriptor ClojureNamespaceSource ClojureNamespaceTestDescriptor ClojureTestEngine)
+           (org.junit.gen5.engine.support.descriptor EngineDescriptor)))
 
-(def ^:dynamic *tests* nil)
+(defprotocol Discoverable
+  (-discover-tests [this] "Return a seqable? of any test vars discovered in this."))
 
-(defmulti scan-report :type)
+(extend-protocol Discoverable
+  nil
+  (-discover-tests [_] nil)
+  Var
+  (-discover-tests [var]
+    (if (-> var meta :test)
+      [var]))
+  Symbol
+  (-discover-tests [sym]
+    (if (namespace sym)
+      (-discover-tests (find-var sym))
+      (-discover-tests
+        (do
+          (require sym)
+          (find-ns sym)))))
+  Namespace
+  (-discover-tests [ns]
+    (->> ns ns-interns vals (mapcat -discover-tests)))
+  File
+  (-discover-tests [file]
+    (mapcat -discover-tests (find-namespaces [file])))
+  Path
+  (-discover-tests [path]
+    (-discover-tests (.toFile path))))
 
-(defmethod scan-report :begin-test-var [m]
-  (let [test-var (-> m :var meta :old-var)]
-    (swap! *tests* conj (meta test-var))))
+(defn- ns->descriptor [[ns vars]]
+  (let [ns-desc (-> ns str ClojureNamespaceSource. ClojureNamespaceTestDescriptor.)
+        var->descriptor #(-> % meta ClojureVarSource/fromMeta ClojureVarTestDescriptor.)
+        var-descs (map var->descriptor vars)]
+    (doseq [var-desc var-descs]
+      (.addChild ns-desc var-desc))
+    ns-desc))
 
-(defmethod scan-report :default [_] nil)
-
-(defn suppress-test-var
-  [real-test-var]
-  (fn [v]
-    (let [old-meta (meta v)
-          new-meta (assoc old-meta :test (fn [& _] nil) :old-var v)
-          suppressed (with-meta @v new-meta)]
-      (real-test-var suppressed))))
-
-(defn scan-namespaces
-  [namespaces]
-  (let [real-test-var test/test-var]
-    (binding [*tests* (atom [])
-              test/report scan-report
-              test/test-var (suppress-test-var real-test-var)]
-      (apply test/run-tests namespaces)
-      @*tests*)))
-
-(defn scan-dirs
-  [dirs]
-  (let [namespaces (find-namespaces dirs)]
-    ;; make sure each namespace is loaded
-    (doseq [namespace namespaces]
-      (require namespace))
-    (scan-namespaces namespaces)))
+(defn discover-descriptor [roots]
+  (let [engine-desc (EngineDescriptor. ClojureTestEngine/ENGINE_ID ClojureTestEngine/ENGINE_ID)
+        ns-descs (->> roots
+                      (mapcat -discover-tests)
+                      (group-by (comp :ns meta))
+                      (map ns->descriptor))]
+    (doseq [ns-desc ns-descs]
+      (.addChild engine-desc ns-desc))
+    engine-desc))
