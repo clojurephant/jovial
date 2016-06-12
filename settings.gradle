@@ -1,3 +1,4 @@
 include 'jupiter-engine-clojure.test'
+include 'jupiter-launcher'
 include 'jupiter-plugin-gradle'
 

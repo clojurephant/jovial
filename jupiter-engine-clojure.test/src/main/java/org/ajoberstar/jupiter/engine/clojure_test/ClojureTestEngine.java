@@ -21,8 +21,10 @@ public class ClojureTestEngine implements TestEngine {
             .map(ClasspathSelector::getClasspathRoot)
             .collect(Collectors.toList());
 
-        IFn scanner = Clojure.var("org.ajoberstar.jupiter.engine.clojure-test.discovery", "scan-dirs");
+        IFn require = Clojure.var("clojure.core", "require");
+        require.invoke(Clojure.read("org.ajoberstar.jupiter.engine.clojure-test.discovery"));
 
+        IFn scanner = Clojure.var("org.ajoberstar.jupiter.engine.clojure-test.discovery", "scan-dirs");
         List<Map<Object, Object>> tests = (List<Map<Object, Object>>) scanner.invoke(testDirs);
 
         Map<ClojureNamespaceSource, List<ClojureVarSource>> testSources = tests.stream()
@@ -45,7 +47,11 @@ public class ClojureTestEngine implements TestEngine {
 
     @Override
     public void execute(ExecutionRequest request) {
-        // TODO implement this
+        IFn require = Clojure.var("clojure.core", "require");
+        require.invoke(Clojure.read("org.ajoberstar.jupiter.engine.clojure-test.execution"));
+
+        IFn scanner = Clojure.var("org.ajoberstar.jupiter.engine.clojure-test.execution", "execute-tests");
+        scanner.invoke(request.getRootTestDescriptor(), request.getEngineExecutionListener());
     }
 
     @Override
