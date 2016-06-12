@@ -1,23 +1,18 @@
 (ns org.ajoberstar.jupiter.engine.clojure-test.execution
   (:require [clojure.test :as test]
-            [clojure.string :as str])
+            [org.ajoberstar.jupiter.lang.clojure :as lang])
   (:import (org.junit.gen5.engine TestExecutionResult EngineExecutionListener)
-           (org.ajoberstar.jupiter.engine.clojure_test ClojureVarTestDescriptor)
            (org.junit.gen5.engine.support.descriptor EngineDescriptor)))
 
 (def ^:dynamic *listener* nil)
 
-(def ^:dynamic *root-descriptor* nil)
+(def ^:dynamic *descs* nil)
 
 (def ^:dynamic *current-desc* nil)
 
-(defn descriptor [var]
-  (let [{:keys [ns name]} (meta var)
-        unique-id (str ns "/" name)
-        matches (fn [desc]
-                  (if (= unique-id (.getUniqueId desc))
-                    desc))]
-    (some matches (.allDescendants *root-descriptor*))))
+(defn descriptors [root]
+  (let [xf (map (fn [desc] [(-> desc .getSource lang/->ref) desc]))]
+    (into {} xf (.getAllDescendants root))))
 
 (defn ex-fail [{:keys [message expected actual]}]
   (let [msg (with-out-str
@@ -33,13 +28,12 @@
 (defmulti listener-report :type)
 
 (defmethod listener-report :begin-test-var [m]
-  (let [desc (descriptor (:var m))]
+  (let [desc (->> m :var (get *descs*))]
     (reset! *current-desc* desc)
     (.executionStarted *listener* desc)))
 
 (defmethod listener-report :end-test-var [m]
-  (let [desc (descriptor (:var m))]
-    (reset! *current-desc* nil)))
+  (reset! *current-desc* nil))
 
 (defmethod listener-report :pass [m]
   (let [desc @*current-desc*
@@ -58,16 +52,15 @@
 
 (defmethod listener-report :default [_] nil)
 
+(defn filtering-test-var [real-test-var]
+  (fn [v]
+    (if (contains? *descs* v)
+      (real-test-var v))))
+
 (defn execute-tests [^EngineDescriptor descriptor ^EngineExecutionListener listener]
-  (binding [*root-descriptor* descriptor
-            *listener* listener
+  (binding [*listener* listener
+            *descs* (descriptors descriptor)
             *current-desc* (atom nil)
+            test/test-var (filtering-test-var test/test-var)
             test/report listener-report]
-    (let [xf (comp (filter #(instance? ClojureVarTestDescriptor %))
-                   (map (fn [desc]
-                          (let [[namespace name] (str/split (.getName desc) #"/")]
-                            (symbol namespace name))))
-                   (map find-var))
-          vars (sequence xf (.allDescendants *root-descriptor*))]
-      (println vars)
-      (test/test-vars vars))))
+    (test/run-all-tests)))

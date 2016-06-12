@@ -9,12 +9,21 @@ buildscript {
 
 apply plugin: 'org.ajoberstar.semver-vcs-grgit'
 
+ext.defaultVersions = [
+    'org.junit': '5.0.0-SNAPSHOT',
+    'org.clojure:clojure': '1.9.0-alpha5'
+]
+
 allprojects {
     group = 'org.ajoberstar.jupiter'
 
     plugins.withId('java') {
         repositories {
             jcenter()
+            maven {
+                name = 'sonatype-snapshots'
+                url = 'https://oss.sonatype.org/content/repositories/snapshots'
+            }
         }
     }
 
@@ -22,6 +31,15 @@ allprojects {
         publishing {
             repositories {
                 mavenLocal()
+            }
+        }
+    }
+
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.version == 'default') {
+                def version = defaultVersions["${details.requested.group}:${details.requested.name}"] ?: defaultVersions[details.requested.group]
+                details.useVersion version
             }
         }
     }

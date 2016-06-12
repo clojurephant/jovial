@@ -24,16 +24,16 @@ public class DiscoveryPrinter {
             .collect(Collectors.toSet());
 
         TestDiscoveryRequest discoveryRequest = TestDiscoveryRequestBuilder.request()
-            .select(ClasspathSelector.forPaths(dirs))
+            .selectors(ClasspathSelector.selectClasspathRoots(dirs))
             .build();
 
         TestPlan plan = launcher.discover(discoveryRequest);
         plan.getRoots().forEach(root -> printDescriptor(plan, root, 0));
     }
 
-    public static void printDescriptor(TestPlan plan, TestIdentifier id, int level) {
+    private static void printDescriptor(TestPlan plan, TestIdentifier id, int level) {
         IntStream.range(0, level).forEach(i -> System.out.print("\t"));
-        System.out.println(id.getUniqueId());
+        System.out.println(id.getDisplayName());
         plan.getChildren(id).forEach(child -> printDescriptor(plan, child, level + 1));
     }
 }

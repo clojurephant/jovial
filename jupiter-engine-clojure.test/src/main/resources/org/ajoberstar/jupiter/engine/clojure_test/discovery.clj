@@ -1,9 +1,10 @@
 (ns org.ajoberstar.jupiter.engine.clojure-test.discovery
-  (:require [clojure.tools.namespace.find :refer [find-namespaces]])
+  (:require [clojure.tools.namespace.find :refer [find-namespaces]]
+            [org.ajoberstar.jupiter.lang.clojure :as lang])
   (:import (clojure.lang Var Symbol Namespace)
            (java.io File)
            (java.nio.file Path)
-           (org.ajoberstar.jupiter.engine.clojure_test ClojureVarSource ClojureVarTestDescriptor ClojureNamespaceSource ClojureNamespaceTestDescriptor ClojureTestEngine)
+           (org.ajoberstar.jupiter.engine.clojure_test ClojureTestEngine ClojureTestDescriptor)
            (org.junit.gen5.engine.support.descriptor EngineDescriptor)))
 
 (defprotocol Discoverable
@@ -35,19 +36,21 @@
     (-discover-tests (.toFile path))))
 
 (defn- ns->descriptor [[ns vars]]
-  (let [ns-desc (-> ns str ClojureNamespaceSource. ClojureNamespaceTestDescriptor.)
-        var->descriptor #(-> % meta ClojureVarSource/fromMeta ClojureVarTestDescriptor.)
-        var-descs (map var->descriptor vars)]
+  (let [->descriptor (fn [x] (ClojureTestDescriptor. (lang/->id x) (lang/->friendly x) (lang/->source x)))
+        ns-desc (->descriptor ns)
+        var-descs (map ->descriptor vars)]
     (doseq [var-desc var-descs]
       (.addChild ns-desc var-desc))
     ns-desc))
 
-(defn discover-descriptor [roots]
-  (let [engine-desc (EngineDescriptor. ClojureTestEngine/ENGINE_ID ClojureTestEngine/ENGINE_ID)
-        ns-descs (->> roots
-                      (mapcat -discover-tests)
-                      (group-by (comp :ns meta))
-                      (map ns->descriptor))]
-    (doseq [ns-desc ns-descs]
-      (.addChild engine-desc ns-desc))
-    engine-desc))
+(defn discover-descriptor [root-id roots]
+  (binding [lang/*root-id* root-id]
+    (let [engine-desc (EngineDescriptor. root-id ClojureTestEngine/ENGINE_ID)]
+      (doseq [root roots]
+        (binding [lang/*root-dir* root]
+          (let [ns-descs (->> (-discover-tests root)
+                              (group-by (comp :ns meta))
+                              (map ns->descriptor))]
+            (doseq [ns-desc ns-descs]
+              (.addChild engine-desc ns-desc)))))
+      engine-desc)))

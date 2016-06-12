@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    compile 'org.junit:junit-launcher:5.0.0-ALPHA'
+    compile 'org.junit:junit-launcher:default'
     compile project(':jupiter-engine-clojure.test')
 }
 

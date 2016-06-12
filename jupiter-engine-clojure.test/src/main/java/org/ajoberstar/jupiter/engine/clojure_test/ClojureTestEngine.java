@@ -13,7 +13,7 @@ public class ClojureTestEngine implements TestEngine {
     public static final String ENGINE_ID = "clojure.test";
 
     @Override
-    public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest) {
+    public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
         // TODO support UniqueIdSelectors
         List<File> testDirs = discoveryRequest.getSelectorsByType(ClasspathSelector.class).stream()
             .map(ClasspathSelector::getClasspathRoot)
@@ -23,7 +23,7 @@ public class ClojureTestEngine implements TestEngine {
         require.invoke(Clojure.read("org.ajoberstar.jupiter.engine.clojure-test.discovery"));
 
         IFn scanner = Clojure.var("org.ajoberstar.jupiter.engine.clojure-test.discovery", "discover-descriptor");
-        TestDescriptor descriptor = (TestDescriptor) scanner.invoke(testDirs);
+        TestDescriptor descriptor = (TestDescriptor) scanner.invoke(uniqueId, testDirs);
 
         // TODO support filters
 

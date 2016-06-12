@@ -23,7 +23,7 @@ public class ExecutionPrinter {
             .collect(Collectors.toSet());
 
         TestDiscoveryRequest discoveryRequest = TestDiscoveryRequestBuilder.request()
-            .select(ClasspathSelector.forPaths(dirs))
+            .selectors(ClasspathSelector.selectClasspathRoots(dirs))
             .build();
 
         SummaryGeneratingListener listener = new SummaryGeneratingListener();
@@ -38,8 +38,8 @@ public class ExecutionPrinter {
         launcher.execute(discoveryRequest);
 
         try (PrintWriter writer = new PrintWriter(System.out)) {
-            listener.getSummary().printOn(writer);
-            listener.getSummary().printFailuresOn(writer);
+            listener.getSummary().printTo(writer);
+            listener.getSummary().printFailuresTo(writer);
         }
     }
 }

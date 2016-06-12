@@ -8,7 +8,6 @@ dependencies {
     compile 'org.clojure:clojure:default'
     compile 'org.clojure:tools.namespace:0.2.11'
     compile 'org.apache.commons:commons-lang3:3.4'
-    compile project(':jupiter-lang-clojure')
 
     testCompile 'junit:junit:4.12'
 }
