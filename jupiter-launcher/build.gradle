@@ -15,6 +15,14 @@ task discoverClojureTest(type: JavaExec) {
     args 'src/sample/clojure.test'
 }
 
+
+task discoverNsClojureTest(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    classpath files('src/sample/clojure.test')
+    main = 'org.ajoberstar.jupiter.launcher.DiscoveryPrinter'
+    args 'src/sample/clojure.test'
+}
+
 task executeClojureTest(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     classpath files('src/sample/clojure.test')

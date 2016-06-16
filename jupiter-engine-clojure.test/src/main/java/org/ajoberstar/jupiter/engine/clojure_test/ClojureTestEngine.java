@@ -2,12 +2,21 @@ package org.ajoberstar.jupiter.engine.clojure_test;
 
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
-import org.junit.gen5.engine.*;
+import clojure.lang.Namespace;
+import clojure.lang.Var;
+import org.ajoberstar.jupiter.lang.clojure.NamespaceSelector;
+import org.ajoberstar.jupiter.lang.clojure.VarSelector;
+import org.junit.gen5.engine.EngineDiscoveryRequest;
+import org.junit.gen5.engine.ExecutionRequest;
+import org.junit.gen5.engine.TestDescriptor;
+import org.junit.gen5.engine.TestEngine;
+import org.junit.gen5.engine.UniqueId;
 import org.junit.gen5.engine.discovery.ClasspathSelector;
 
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ClojureTestEngine implements TestEngine {
     public static final String ENGINE_ID = "clojure.test";
@@ -15,15 +24,25 @@ public class ClojureTestEngine implements TestEngine {
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
         // TODO support UniqueIdSelectors
-        List<File> testDirs = discoveryRequest.getSelectorsByType(ClasspathSelector.class).stream()
-            .map(ClasspathSelector::getClasspathRoot)
+        Stream<File> testDirs = discoveryRequest.getSelectorsByType(ClasspathSelector.class).stream()
+            .map(ClasspathSelector::getClasspathRoot);
+
+        Stream<Namespace> namespaces = discoveryRequest.getSelectorsByType(NamespaceSelector.class).stream()
+            .map(NamespaceSelector::getNamespace);
+
+        Stream<Var> vars = discoveryRequest.getSelectorsByType(VarSelector.class).stream()
+            .map(VarSelector::getVar);
+
+        List<? extends Object> roots = Stream.of(testDirs, namespaces, vars)
+            .reduce(Stream::concat)
+            .orElse(Stream.empty())
             .collect(Collectors.toList());
 
         IFn require = Clojure.var("clojure.core", "require");
         require.invoke(Clojure.read("org.ajoberstar.jupiter.engine.clojure-test.discovery"));
 
         IFn scanner = Clojure.var("org.ajoberstar.jupiter.engine.clojure-test.discovery", "discover-descriptor");
-        TestDescriptor descriptor = (TestDescriptor) scanner.invoke(uniqueId, testDirs);
+        TestDescriptor descriptor = (TestDescriptor) scanner.invoke(uniqueId, roots);
 
         // TODO support filters
 

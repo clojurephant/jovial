@@ -1,5 +1,6 @@
 (ns org.ajoberstar.jupiter.engine.clojure-test.discovery
   (:require [clojure.tools.namespace.find :refer [find-namespaces]]
+            [clojure.java.io :as io]
             [org.ajoberstar.jupiter.lang.clojure :as lang])
   (:import (clojure.lang Var Symbol Namespace)
            (java.io File)
@@ -47,7 +48,7 @@
   (binding [lang/*root-id* root-id]
     (let [engine-desc (EngineDescriptor. root-id ClojureTestEngine/ENGINE_ID)]
       (doseq [root roots]
-        (binding [lang/*root-dir* root]
+        (binding [lang/*root-dir* (if (satisfies? io/Coercions root) root)]
           (let [ns-descs (->> (-discover-tests root)
                               (group-by (comp :ns meta))
                               (map ns->descriptor))]

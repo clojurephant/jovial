@@ -11,6 +11,7 @@ dependencies {
     compile project(':jupiter-lang-clojure')
 
     testCompile 'junit:junit:4.12'
+    testCompile 'org.junit:junit-launcher:default'
 }
 
 task sourcesJar(type: Jar) {
