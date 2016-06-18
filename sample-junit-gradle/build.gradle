@@ -1,0 +1,36 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    }
+    dependencies {
+        classpath 'org.junit:junit-gradle:5.0.0-SNAPSHOT'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.junit.gen5.gradle'
+
+repositories {
+    repositories {
+        jcenter()
+        maven {
+            name = 'sonatype-snapshots'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
+        // temporary until linked to jcenter
+        maven {
+            name = 'ajoberstar'
+            url = 'http://dl.bintray.com/ajoberstar/maven'
+        }
+    }
+}
+
+dependencies {
+    compile 'org.clojure:clojure:1.8.0'
+    testRuntime 'org.ajoberstar.jupiter:jupiter-engine-clojure.test:0.1.1'
+}
+
+junit5 {
+    version '5.0.0-SNAPSHOT'
+}
