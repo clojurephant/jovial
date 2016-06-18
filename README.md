@@ -4,6 +4,8 @@
 [![Travis](https://img.shields.io/travis/ajoberstar/jupiter.svg?style=flat-square)](https://travis-ci.org/ajoberstar/jupiter)
 [![GitHub license](https://img.shields.io/github/license/ajoberstar/jupiter.svg?style=flat-square)](https://github.com/ajoberstar/jupiter/blob/master/LICENSE)
 
+**DISCLAIMER:** JUnit5 is still in early development. Jupiter is currently build on SNAPSHOT versions of JUnit5.
+
 ## Why do you care?
 
 Wouldn't it be great to have one test launcher to rule them all? One API that tools need to support and that other test frameworks
@@ -22,11 +24,11 @@ Jupiter's main goal is to help provide launchers and engines to extend the suppo
 
 #### Engines
 
-- [clojure.test](https://clojure.github.io/clojure/clojure.test-api.html) through `org.ajoberstar.jupiter:jupiter-engine-clojure.test`
+- [clojure.test](https://clojure.github.io/clojure/clojure.test-api.html)
 
 #### Launchers
 
-- [Gradle 3](https://docs.gradle.org/current/userguide/userguide.html) through `org.ajoberstar.jupiter:jupiter-launcher-gradle`
+- [Gradle 3](https://docs.gradle.org/current/userguide/userguide.html)
 
 ## Usage
 
@@ -34,6 +36,18 @@ Jupiter's main goal is to help provide launchers and engines to extend the suppo
 
 * [Release Notes](https://github.com/ajoberstar/jupiter/releases)
 * [Full Documentation](https://github.com/ajoberstar/jupiter/wiki)
+
+### clojure.test
+
+Run JUnit5 through [your favorite method](http://junit.org/junit5/docs/current/user-guide/#running-tests), just make
+sure that you have `org.ajoberstar.jupiter:jupiter-engine-clojure.test` on the classpath.
+
+See the sample [console](sample-junit-console), [maven](sample-junit-maven), and [gradle](sample-junit-gradle) projects
+for more thorough information.
+
+## Gradle 3
+
+... coming soon ...
 
 ## Questions, Bugs, and Features
 

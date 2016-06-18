@@ -1,0 +1,26 @@
+plugins {
+    id 'application'
+}
+
+mainClassName = 'org.junit.gen5.console.ConsoleRunner'
+
+repositories {
+    repositories {
+        jcenter()
+        maven {
+            name = 'sonatype-snapshots'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
+        // temporary until linked to jcenter
+        maven {
+            name = 'ajoberstar'
+            url = 'http://dl.bintray.com/ajoberstar/maven'
+        }
+    }
+}
+
+
+dependencies {
+    compile 'org.junit:junit-console:5.0.0-SNAPSHOT'
+    compile 'org.ajoberstar.jupiter:jupiter-engine-clojure.test:0.1.1'
+}

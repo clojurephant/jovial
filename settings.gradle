@@ -8,4 +8,4 @@ include 'jupiter-engine-clojure.test'
 include 'jupiter-launcher-gradle'
 
 // samples
-include 'jupiter-sample-console'
+include 'sample-junit-console'
