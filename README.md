@@ -6,21 +6,17 @@
 
 ## Why do you care?
 
-[JUnit5](http://junit.org/junit5/)'s best new feature isn't the lambda support, it's the new launching API. It's extensible from two sides:
+Wouldn't it be great to have one test launcher to rule them all? One API that tools need to support and that other test frameworks
+could implement, so that neither need to know about the other? [JUnit5](http://junit.org/junit5/)'s launching API has that promise.
 
-- Support for additional test frameworks is implemented through a `TestEngine`
-- Support for additional tooling goes through the `Launcher` API
+All it needs is support from the JVM community to provide:
 
-Importantly, the `TestEngine` can be implemented independently of the test framework itself. Neither the test framework
-nor the developer writing tests in that framework need to know (or care) that it's being executed through a JUnit engine.
-
-Additionally, the tools using the `Launcher` don't need to have knowledge of the available engines. They just execute
-through the launcher, and whatever engines are on the classpath get used to discover and execute tests.
+- Launchers to execute JUnit from new (and the same old) places
+- TestEngines to support new (and the same old) testing frameworks
 
 ## What is it?
 
-Jupiter's main goal is to build on JUnit5's launching/engine APIs to provide support for running JUnit in more places
-and running more than just JUnit.
+Jupiter's main goal is to help provide launchers and engines to extend the support of JUnit5 to new places.
 
 While my initial test framework support is targeted at Clojure, that isn't meant to imply that's the only goal.
 
