@@ -9,12 +9,6 @@ buildscript {
 
 apply plugin: 'org.ajoberstar.semver-vcs-grgit'
 
-ext.defaultVersions = [
-    'org.junit': '5.0.0-SNAPSHOT',
-    'org.clojure:clojure': '1.9.0-alpha5',
-    'org.clojure:tools.namespace': '0.2.11'
-]
-
 allprojects {
     group = 'org.ajoberstar.jupiter'
 
@@ -57,15 +51,6 @@ allprojects {
                     name = project.version
                     vcsTag = project.version
                 }
-            }
-        }
-    }
-
-    configurations.all {
-        resolutionStrategy.eachDependency { details ->
-            if (details.requested.version == 'default') {
-                def version = defaultVersions["${details.requested.group}:${details.requested.name}"] ?: defaultVersions[details.requested.group]
-                details.useVersion version
             }
         }
     }

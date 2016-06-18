@@ -5,12 +5,12 @@ plugins {
 }
 
 dependencies {
-    compile 'org.junit:junit-engine-api:default'
-    compile 'org.clojure:clojure:default'
+    compile 'org.junit:junit-engine-api:5.0.0-SNAPSHOT'
+    compile 'org.clojure:clojure:1.9.0-alpha5'
     compile project(':jupiter-lang-clojure')
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.junit:junit-launcher:default'
+    testCompile 'org.junit:junit-launcher:5.0.0-SNAPSHOT'
 }
 
 task sourcesJar(type: Jar) {
