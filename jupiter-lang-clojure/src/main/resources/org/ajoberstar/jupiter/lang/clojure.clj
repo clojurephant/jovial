@@ -1,11 +1,10 @@
 (ns org.ajoberstar.jupiter.lang.clojure
   (:require [clojure.java.io :as io])
-  (:import (java.io File)
-           (java.nio.file Path)
-           (org.junit.gen5.engine.support.descriptor DirectorySource FileSource FilePosition CompositeTestSource)
+  (:import (org.junit.gen5.engine.support.descriptor FileSource FilePosition CompositeTestSource)
            (org.junit.gen5.engine TestSource UniqueId)
-           (clojure.lang Symbol Namespace Var)
+           (clojure.lang Namespace Var)
            (java.util Optional)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; UniqueId creation
@@ -24,14 +23,7 @@
   Var
   (->id [var]
     (let [ns-id (-> var meta :ns ->id)]
-      (.append ns-id "name" (-> var meta :name name))))
-  Symbol
-  (->id [sym]
-    (if (namespace sym)
-      (->id (find-var sym))
-      (do
-        (require sym)
-        (->id (find-ns sym))))))
+      (.append ns-id "name" (-> var meta :name name)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TestSource creation
@@ -44,45 +36,23 @@
   (toString [_] (str "ClojureNamespaceSource[namespace = " namespace "]"))
   TestSource)
 
+(defn ns-source [namespace]
+  (->ClojureNamespaceSource (str namespace)))
+
 (defrecord ClojureVarSource
   [namespace name]
   Object
   (toString [_] (str "ClojureVarSource[namespace = " namespace ", name = " name "]"))
   TestSource)
 
-(defprotocol ClojureTestSource
-  (->source [this] "Creates a test source from this object."))
-
-(extend-protocol ClojureTestSource
-  nil
-  (->source [_] nil)
-  File
-  (->source [file]
-    (if (.isDirectory file)
-      (DirectorySource. file)
-      (FileSource. file)))
-  Path
-  (->source [path]
-    (->source (.toFile path)))
-  Namespace
-  (->source [ns]
-    (->ClojureNamespaceSource (str ns)))
-  Var
-  (->source [var]
-    (let [{:keys [ns name file line column]} (meta var)
-          file-pos (if (and line column) (FilePosition. line column))
-          file (if file (FileSource. (io/file *root-dir* file) file-pos))
-          var (->ClojureVarSource (str ns) (str name))]
-      (if file
-        (CompositeTestSource. [var file])
-        var)))
-  Symbol
-  (->source [sym]
-    (if (namespace sym)
-      (->source (find-var sym))
-      (do
-        (require sym)
-        (->source (find-ns sym))))))
+(defn var-source [var]
+  (let [{:keys [ns name file line column]} (meta var)
+        file-pos (if (and line column) (FilePosition. line column))
+        file (if file (FileSource. (io/file *root-dir* file) file-pos))
+        var (->ClojureVarSource (str ns) (str name))]
+    (if file
+      (CompositeTestSource. [var file])
+      var)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Converting to a ref

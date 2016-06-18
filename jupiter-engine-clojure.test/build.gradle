@@ -24,6 +24,10 @@ task javadocJar(type: Jar) {
     from tasks.javadoc.outputs.files
 }
 
+test {
+    systemProperty "classpath.roots", classpath.asPath
+}
+
 publishing {
     publications {
         main(MavenPublication) {
