@@ -18,7 +18,7 @@ ext.defaultVersions = [
 allprojects {
     group = 'org.ajoberstar.jupiter'
 
-    plugins.withId('java') {
+    pluginManager.withPlugin('java') {
         repositories {
             jcenter()
             maven {
@@ -28,10 +28,35 @@ allprojects {
         }
     }
 
-    plugins.withId('maven-publish') {
+    pluginManager.withPlugin('maven-publish') {
         publishing {
             repositories {
                 mavenLocal()
+            }
+        }
+    }
+
+    pluginManager.withPlugin('com.jfrog.bintray') {
+        bintray {
+            user = System.env['BINTRAY_USER']
+            key = System.env['BINTRAY_KEY']
+            publications = ['main']
+            publish = true
+            pkg {
+                repo = 'maven'
+                name = 'jupiter'
+                licenses = ['EPL-1.0']
+                websiteUrl = 'https://github.com/ajoberstar/jupiter'
+                issueTrackerUrl = 'https://github.com/ajoberstar/jupiter/issues'
+                vcsUrl = 'https://github.com/ajoberstar/jupiter.git'
+                labels = ['junit', 'junit5', 'clojure', 'testing', 'gradle']
+                publicDownloadNumbers = true
+                githubRepo = 'ajoberstar/jupiter'
+
+                version {
+                    name = project.version
+                    vcsTag = project.version
+                }
             }
         }
     }
