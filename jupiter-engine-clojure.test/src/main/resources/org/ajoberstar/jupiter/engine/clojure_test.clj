@@ -1,10 +1,12 @@
 (ns org.ajoberstar.jupiter.engine.clojure-test
   (:require [org.ajoberstar.jupiter.lang.clojure :as lang]
             [org.ajoberstar.jupiter.lang.clojure.engine :as engine]
-            [clojure.test :as test])
+            [clojure.test :as test]
+            [clojure.stacktrace :as stack])
   (:import (org.junit.gen5.engine ConfigurationParameters TestExecutionResult TestTag)
            (org.junit.gen5.engine.support.descriptor EngineDescriptor)
-           (org.ajoberstar.jupiter.engine.clojure_test ClojureTestEngine ClojureTestDescriptor)))
+           (org.ajoberstar.jupiter.engine.clojure_test ClojureTestEngine ClojureTestDescriptor)
+           (org.opentest4j AssertionFailedError)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -48,17 +50,6 @@
   (let [xf (map (fn [desc] [(-> desc .getSource lang/->ref) desc]))]
     (into {} xf (.getAllDescendants root))))
 
-(defn ex-fail [{:keys [message expected actual]}]
-  (let [msg (with-out-str
-              (println (or message ""))
-              (if expected
-                (println "expected: " (pr-str expected)))
-              (if-not (instance? Throwable actual)
-                (println "actual:   " (pr-str actual))))]
-    (if (instance? Throwable actual)
-      (ex-info msg {} actual)
-      (ex-info msg {}))))
-
 (defmulti listener-report :type)
 
 (defmethod listener-report :begin-test-var [m]
@@ -74,14 +65,37 @@
         result (TestExecutionResult/successful)]
     (.executionFinished *listener* desc result)))
 
+(defn- ex-fail [{:keys [message expected actual] :as m}]
+  (let [msg (with-out-str
+              (println "FAIL in " (test/testing-vars-str m))
+              (when (seq test/*testing-contexts*)
+                (println (test/testing-contexts-str)))
+              (when message
+                (println message))
+              (println "expected: " expected)
+              (println "  actual: " actual))]
+    (AssertionFailedError. msg expected actual)))
+
 (defmethod listener-report :fail [m]
   (let [desc @*current-desc*
         result (TestExecutionResult/failed (ex-fail m))]
     (.executionFinished *listener* desc result)))
 
+(defn- ex-error [{:keys [message expected actual] :as m}]
+  (let [msg (with-out-str
+              (println "ERROR in " (test/testing-vars-str m))
+              (when (seq test/*testing-contexts*)
+                (println (test/testing-contexts-str)))
+              (when message
+                (println message))
+              (println "expected: " expected)
+              (print "  actual: ")
+              (stack/print-cause-trace actual test/*stack-trace-depth*))]
+    (AssertionFailedError. msg actual)))
+
 (defmethod listener-report :error [m]
   (let [desc @*current-desc*
-        result (TestExecutionResult/failed (ex-fail m))]
+        result (TestExecutionResult/failed (ex-error m))]
     (.executionFinished *listener* desc result)))
 
 (defmethod listener-report :default [_] nil)
