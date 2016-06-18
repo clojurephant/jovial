@@ -18,15 +18,6 @@ All it needs is support from the JVM community to provide:
 
 Jupiter's main goal is to help provide launchers and engines to extend the support of JUnit5 to new places.
 
-While my initial test framework support is targeted at Clojure, that isn't meant to imply that's the only goal.
-
-## Usage
-
-**NOTE:** *All* jupiter modules require Java 8 (or higher).
-
-* [Release Notes](https://github.com/ajoberstar/jupiter/releases)
-* [Full Documentation](https://github.com/ajoberstar/jupiter/wiki)
-
 ### Current Support
 
 #### Engines
@@ -36,6 +27,13 @@ While my initial test framework support is targeted at Clojure, that isn't meant
 #### Launchers
 
 - [Gradle 3](https://docs.gradle.org/current/userguide/userguide.html) -- coming soon...
+
+## Usage
+
+**NOTE:** *All* jupiter modules require Java 8 (or higher).
+
+* [Release Notes](https://github.com/ajoberstar/jupiter/releases)
+* [Full Documentation](https://github.com/ajoberstar/jupiter/wiki)
 
 ## Questions, Bugs, and Features
 
