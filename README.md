@@ -1,6 +1,6 @@
 # jupiter
 
-[![Bintray](https://img.shields.io/bintray/v/ajoberstar/libraries/jupiter.svg?style=flat-square)](https://bintray.com/ajoberstar/libraries/jupiter/_latestVersion)
+[![Bintray](https://img.shields.io/bintray/v/ajoberstar/maven/jupiter.svg?style=flat-square)](https://bintray.com/ajoberstar/maven/jupiter/_latestVersion)
 [![Travis](https://img.shields.io/travis/ajoberstar/jupiter.svg?style=flat-square)](https://travis-ci.org/ajoberstar/jupiter)
 [![GitHub license](https://img.shields.io/github/license/ajoberstar/jupiter.svg?style=flat-square)](https://github.com/ajoberstar/jupiter/blob/master/LICENSE)
 
