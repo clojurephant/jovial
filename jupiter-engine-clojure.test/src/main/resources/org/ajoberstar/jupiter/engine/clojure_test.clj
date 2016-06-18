@@ -2,7 +2,7 @@
   (:require [org.ajoberstar.jupiter.lang.clojure :as lang]
             [org.ajoberstar.jupiter.lang.clojure.engine :as engine]
             [clojure.test :as test])
-  (:import (org.junit.gen5.engine ConfigurationParameters TestExecutionResult)
+  (:import (org.junit.gen5.engine ConfigurationParameters TestExecutionResult TestTag)
            (org.junit.gen5.engine.support.descriptor EngineDescriptor)
            (org.ajoberstar.jupiter.engine.clojure_test ClojureTestEngine ClojureTestDescriptor)))
 
@@ -13,11 +13,24 @@
 (defn- test? [cand]
   (-> cand :var meta :test))
 
+(def ^:private excluded-tags #{:ns :file :line :column :doc :author :test :name})
+
+(defn- tags [var]
+  (let [var-meta (-> var meta)
+        ns-meta (-> var-meta :ns meta)
+        full-meta (merge ns-meta var-meta)
+        xf (comp (filter second)
+                 (map first)
+                 (remove excluded-tags)
+                 (map name)
+                 (map #(TestTag/of %)))]
+    (into #{} xf full-meta)))
+
 (defn- var->descriptor [{:keys [var source]}]
-  (ClojureTestDescriptor. (lang/->id var) (lang/->friendly var) source))
+  (ClojureTestDescriptor. (lang/->id var) (lang/->friendly var) (tags var) source))
 
 (defn- ns->descriptor [[ns candidates]]
-  (let [ns-desc (ClojureTestDescriptor. (lang/->id ns) (lang/->friendly ns) (lang/ns-source ns))]
+  (let [ns-desc (ClojureTestDescriptor. (lang/->id ns) (lang/->friendly ns) (tags ns) (lang/ns-source ns))]
     (doseq [var-desc (map var->descriptor candidates)]
       (.addChild ns-desc var-desc))
     ns-desc))
