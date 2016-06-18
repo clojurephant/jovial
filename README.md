@@ -22,11 +22,11 @@ Jupiter's main goal is to help provide launchers and engines to extend the suppo
 
 #### Engines
 
-- [clojure.test](https://clojure.github.io/clojure/clojure.test-api.html)
+- [clojure.test](https://clojure.github.io/clojure/clojure.test-api.html) through `org.ajoberstar.jupiter:jupiter-engine-clojure.test`
 
 #### Launchers
 
-- [Gradle 3](https://docs.gradle.org/current/userguide/userguide.html) -- coming soon...
+- [Gradle 3](https://docs.gradle.org/current/userguide/userguide.html) through `org.ajoberstar.jupiter:jupiter-launcher-gradle`
 
 ## Usage
 
