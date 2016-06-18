@@ -3,7 +3,7 @@
   (:import (java.io File)
            (java.nio.file Path)
            (org.junit.gen5.engine.support.descriptor DirectorySource FileSource FilePosition CompositeTestSource)
-           (org.junit.gen5.engine TestSource)
+           (org.junit.gen5.engine TestSource UniqueId)
            (clojure.lang Symbol Namespace Var)
            (java.util Optional)))
 
@@ -85,10 +85,14 @@
         (->source (find-ns sym))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Converting a source to a ref
+;; Converting to a ref
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn- id->map [id]
+  (let [xf (map (fn [segment] [(keyword (.getType segment)) (.getValue segment)]))]
+    (into {} xf (.getSegments id))))
+
 (defprotocol ClojureRef
-  (->ref [this] "Finds the ref associated with this source."))
+  (->ref [this] "Finds the ref associated with the provided object."))
 
 (extend-protocol ClojureRef
   nil
@@ -110,6 +114,12 @@
            .getSources
            (some clojure?)
            ->ref)))
+  UniqueId
+  (->ref [id]
+    (let [{:keys [namespace name]} (id->map id)]
+      (if name
+        (find-var (symbol namespace name))
+        (find-ns (symbol namespace)))))
   Optional
   (->ref [opt]
     (if (.isPresent opt)

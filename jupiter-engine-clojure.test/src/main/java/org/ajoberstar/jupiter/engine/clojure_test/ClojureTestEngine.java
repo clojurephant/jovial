@@ -12,6 +12,7 @@ import org.junit.gen5.engine.TestDescriptor;
 import org.junit.gen5.engine.TestEngine;
 import org.junit.gen5.engine.UniqueId;
 import org.junit.gen5.engine.discovery.ClasspathSelector;
+import org.junit.gen5.engine.discovery.UniqueIdSelector;
 
 import java.io.File;
 import java.util.List;
@@ -23,7 +24,6 @@ public class ClojureTestEngine implements TestEngine {
 
     @Override
     public TestDescriptor discover(EngineDiscoveryRequest discoveryRequest, UniqueId uniqueId) {
-        // TODO support UniqueIdSelectors
         Stream<File> testDirs = discoveryRequest.getSelectorsByType(ClasspathSelector.class).stream()
             .map(ClasspathSelector::getClasspathRoot);
 
@@ -33,7 +33,10 @@ public class ClojureTestEngine implements TestEngine {
         Stream<Var> vars = discoveryRequest.getSelectorsByType(VarSelector.class).stream()
             .map(VarSelector::getVar);
 
-        List<? extends Object> roots = Stream.of(testDirs, namespaces, vars)
+        Stream<UniqueId> uniqueIds = discoveryRequest.getSelectorsByType(UniqueIdSelector.class).stream()
+            .map(UniqueIdSelector::getUniqueId);
+
+        List<? extends Object> roots = Stream.of(testDirs, namespaces, vars, uniqueIds)
             .reduce(Stream::concat)
             .orElse(Stream.empty())
             .collect(Collectors.toList());

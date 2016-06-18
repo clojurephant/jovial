@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 import static org.junit.gen5.engine.discovery.ClasspathSelector.selectClasspathRoots;
+import static org.junit.gen5.engine.discovery.UniqueIdSelector.selectUniqueId;
 import static org.ajoberstar.jupiter.lang.clojure.NamespaceSelector.selectNamespace;
 import static org.ajoberstar.jupiter.lang.clojure.VarSelector.selectVar;
 
@@ -77,6 +78,48 @@ public class ClojureTestEngineTest {
         List<UniqueId> expectedIds = Stream.of(
             root.append("namespace", "sample.other-test"),
             root.append("namespace", "sample.other-test").append("name", "my-other-works")
+        ).collect(Collectors.toList());
+
+        TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
+        List<UniqueId> actualIds = descriptor.getAllDescendants().stream()
+            .map(TestDescriptor::getUniqueId)
+            .collect(Collectors.toList());
+
+        assertEquals(expectedIds, actualIds);
+    }
+
+    @Test
+    public void selectingTestByUniqueId() {
+        EngineDiscoveryRequest request = TestDiscoveryRequestBuilder.request()
+            .selectors(selectUniqueId(UniqueId.root("sample", "test").append("namespace", "sample.other-test").append("name", "my-other-works")))
+            .build();
+        UniqueId root = UniqueId.root("sample", "test");
+
+        List<UniqueId> expectedIds = Stream.of(
+            root.append("namespace", "sample.other-test"),
+            root.append("namespace", "sample.other-test").append("name", "my-other-works")
+        ).collect(Collectors.toList());
+
+        TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
+        List<UniqueId> actualIds = descriptor.getAllDescendants().stream()
+            .map(TestDescriptor::getUniqueId)
+            .collect(Collectors.toList());
+
+        assertEquals(expectedIds, actualIds);
+    }
+
+    @Test
+    public void selectingContainerByUniqueId() {
+        EngineDiscoveryRequest request = TestDiscoveryRequestBuilder.request()
+            .selectors(selectUniqueId(UniqueId.root("sample", "test").append("namespace", "sample.other-test")))
+            .build();
+        UniqueId root = UniqueId.root("sample", "test");
+
+        List<UniqueId> expectedIds = Stream.of(
+            root.append("namespace", "sample.other-test"),
+            root.append("namespace", "sample.other-test").append("name", "my-other-works"),
+            root.append("namespace", "sample.other-test").append("name", "my-other-fails"),
+            root.append("namespace", "sample.other-test").append("name", "my-other-error")
         ).collect(Collectors.toList());
 
         TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);

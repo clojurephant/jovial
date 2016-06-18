@@ -6,7 +6,8 @@
            (java.io File)
            (java.nio.file Path)
            (org.ajoberstar.jupiter.engine.clojure_test ClojureTestEngine ClojureTestDescriptor)
-           (org.junit.gen5.engine.support.descriptor EngineDescriptor)))
+           (org.junit.gen5.engine.support.descriptor EngineDescriptor)
+           (org.junit.gen5.engine UniqueId)))
 
 (defprotocol Discoverable
   (-discover-tests [this] "Return a seqable? of any test vars discovered in this."))
@@ -34,7 +35,10 @@
     (mapcat -discover-tests (find-namespaces [file])))
   Path
   (-discover-tests [path]
-    (-discover-tests (.toFile path))))
+    (-discover-tests (.toFile path)))
+  UniqueId
+  (-discover-tests [id]
+    (-discover-tests (lang/->ref id))))
 
 (defn- ns->descriptor [[ns vars]]
   (let [->descriptor (fn [x] (ClojureTestDescriptor. (lang/->id x) (lang/->friendly x) (lang/->source x)))
