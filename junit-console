@@ -1,0 +1,3 @@
+#!/bin/bash
+./gradlew :jupiter-sample-console:installDist --quiet
+./jupiter-sample-console/build/install/jupiter-sample-console/bin/jupiter-sample-console $*

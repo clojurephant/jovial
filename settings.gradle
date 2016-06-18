@@ -7,5 +7,5 @@ include 'jupiter-engine-clojure.test'
 // build/ide launchers
 include 'jupiter-launcher-gradle'
 
-// test fixtures
-include 'jupiter-launcher-sample'
+// samples
+include 'jupiter-sample-console'

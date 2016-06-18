@@ -1,0 +1,11 @@
+plugins {
+    id 'application'
+    id 'maven-publish'
+}
+
+mainClassName = 'org.junit.gen5.console.ConsoleRunner'
+
+dependencies {
+    compile 'org.junit:junit-console:default'
+    compile project(':jupiter-engine-clojure.test')
+}
