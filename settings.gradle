@@ -4,8 +4,8 @@ include 'jupiter-lang-clojure'
 // test engines
 include 'jupiter-engine-clojure.test'
 
-// build/ide plugins
-include 'jupiter-plugin-gradle'
+// build/ide launchers
+include 'jupiter-launcher-gradle'
 
 // test fixtures
-include 'jupiter-launcher'
+include 'jupiter-launcher-sample'
