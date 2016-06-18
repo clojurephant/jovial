@@ -11,7 +11,8 @@ apply plugin: 'org.ajoberstar.semver-vcs-grgit'
 
 ext.defaultVersions = [
     'org.junit': '5.0.0-SNAPSHOT',
-    'org.clojure:clojure': '1.9.0-alpha5'
+    'org.clojure:clojure': '1.9.0-alpha5',
+    'org.clojure:tools.namespace': '0.2.11'
 ]
 
 allprojects {
