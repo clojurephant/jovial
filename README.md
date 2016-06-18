@@ -6,11 +6,23 @@
 
 ## Why do you care?
 
-...
+[JUnit5](http://junit.org/junit5/)'s best new feature isn't the lambda support, it's the new launching API. It's extensible from two sides:
+
+- Support for additional test frameworks is implemented through a `TestEngine`
+- Support for additional tooling goes through the `Launcher` API
+
+Importantly, the `TestEngine` can be implemented independently of the test framework itself. Neither the test framework
+nor the developer writing tests in that framework need to know (or care) that it's being executed through a JUnit engine.
+
+Additionally, the tools using the `Launcher` don't need to have knowledge of the available engines. They just execute
+through the launcher, and whatever engines are on the classpath get used to discover and execute tests.
 
 ## What is it?
 
-Jupiter is...
+Jupiter's main goal is to build on JUnit5's launching/engine APIs to provide support for running JUnit in more places
+and running more than just JUnit.
+
+While my initial test framework support is targeted at Clojure, that isn't meant to imply that's the only goal.
 
 ## Usage
 
@@ -18,6 +30,16 @@ Jupiter is...
 
 * [Release Notes](https://github.com/ajoberstar/jupiter/releases)
 * [Full Documentation](https://github.com/ajoberstar/jupiter/wiki)
+
+### Current Support
+
+#### Engines
+
+- [clojure.test](https://clojure.github.io/clojure/clojure.test-api.html)
+
+#### Launchers
+
+- [Gradle 3](https://docs.gradle.org/current/userguide/userguide.html) -- coming soon...
 
 ## Questions, Bugs, and Features
 
@@ -37,4 +59,4 @@ to make sure it's not already in progress and for any needed discussion.
 
 ## Acknowledgements
 
-Thanks to the [JUnit5 team](https://github.com/orgs/junit-team/people) for putting together a great new API!
+Thanks to the [JUnit5 team](https://github.com/junit-team/junit5/graphs/contributors) for putting together a great new API!
