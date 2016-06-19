@@ -6,6 +6,3 @@ include 'jupiter-engine-clojure.test'
 
 // build/ide launchers
 include 'jupiter-launcher-gradle'
-
-// samples
-include 'sample-junit-console'
