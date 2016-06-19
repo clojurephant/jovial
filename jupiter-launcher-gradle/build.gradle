@@ -1,6 +1,8 @@
 plugins {
     id 'java'
-//    id 'maven-publish'
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+    id 'com.jfrog.bintray'
 }
 
 configurations.all {
@@ -24,12 +26,12 @@ task javadocJar(type: Jar) {
     from tasks.javadoc.outputs.files
 }
 
-//publishing {
-//    publications {
-//        main(MavenPublication) {
-//            from components.java
-//            artifact sourcesJar
-//            artifact javadocJar
-//        }
-//    }
-//}
+publishing {
+    publications {
+        main(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
