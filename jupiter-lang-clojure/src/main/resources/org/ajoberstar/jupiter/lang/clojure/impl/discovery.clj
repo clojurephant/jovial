@@ -1,13 +1,14 @@
 (ns org.ajoberstar.jupiter.lang.clojure.impl.discovery
   (:refer-clojure :exclude [filter])
   (:require [org.ajoberstar.jupiter.lang.clojure :as lang]
-            [clojure.tools.namespace.find :refer [find-namespaces]])
+            [clojure.tools.namespace.find :refer [find-namespaces]]
+            [clojure.string :as str])
   (:import (clojure.lang Var Namespace)
            (org.junit.gen5.engine UniqueId Filter EngineDiscoveryRequest)
            (java.io File)
            (java.nio.file Path)
            (org.ajoberstar.jupiter.lang.clojure VarSelector NamespaceSelector NamespaceFilter)
-           (org.junit.gen5.engine.discovery UniqueIdSelector ClasspathSelector)))
+           (org.junit.gen5.engine.discovery UniqueIdSelector ClasspathSelector ClassSelector)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Selecting candidates for discovery
@@ -36,6 +37,19 @@
         (->> [dir] find-namespaces (map sym->ns) (mapcat -select)))))
   Path
   (-select [dir] (-select (.toFile dir)))
+  Class
+  (-select [clazz]
+    (let [clazz-name (.getCanonicalName clazz)
+          ns-path (str "/" (str/replace clazz-name "." "/"))
+          ns-for-class? (fn [ns]
+                          (let [ns-name (-> ns str (str/replace "-" "_"))]
+                            (if (= ns-name clazz-name)
+                              ns)))]
+      (try
+        (load ns-path)
+        (-select (some ns-for-class? (all-ns)))
+        (catch Exception _
+          nil))))
   VarSelector
   (-select [selector] (-select (.getVar selector)))
   NamespaceSelector
@@ -43,7 +57,10 @@
   UniqueIdSelector
   (-select [selector] (-select (.getUniqueId selector)))
   ClasspathSelector
-  (-select [selector] (-select (.getClasspathRoot selector))))
+  (-select [selector] (-select (.getClasspathRoot selector)))
+  ClassSelector
+  (-select [selector] (-select (.getJavaClass selector))))
+
 
 (defn select [^EngineDiscoveryRequest request]
   (mapcat -select (.getSelectors request)))
