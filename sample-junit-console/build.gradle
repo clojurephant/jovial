@@ -11,11 +11,6 @@ repositories {
             name = 'sonatype-snapshots'
             url = 'https://oss.sonatype.org/content/repositories/snapshots'
         }
-        // temporary until linked to jcenter
-        maven {
-            name = 'ajoberstar'
-            url = 'http://dl.bintray.com/ajoberstar/maven'
-        }
     }
 }
 
