@@ -1,0 +1,49 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'org.ajoberstar.jupiter:jupiter-launcher-gradle:0.2.0-dev.1'
+    }
+}
+
+apply plugin: 'java-lang'
+apply plugin: 'org.ajoberstar.jupiter'
+
+repositories {
+    repositories {
+        jcenter()
+        maven {
+            name = 'sonatype-snapshots'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots'
+        }
+        mavenLocal()
+    }
+}
+
+import org.ajoberstar.jupiter.launcher.gradle.JupiterTestSuiteSpec
+
+model {
+    components {
+        main(JvmLibrarySpec) {
+            dependencies {
+                module 'org.clojure:clojure:1.8.0'
+            }
+        }
+    }
+    testSuites {
+        test(JupiterTestSuiteSpec) {
+            jupiterVersion '+'
+            jUnitVersion '5.0.0-SNAPSHOT'
+            dependencies {
+//                module 'org.junit:junit-console:5.0.0-SNAPSHOT'
+                module 'org.ajoberstar.jupiter:jupiter-engine-clojure.test:0.2.0-dev.1'
+                module 'org.ajoberstar.jupiter:jupiter-lang-clojure:0.2.0-dev.1'
+                module 'org.clojure:clojure:1.8.0'
+                module 'org.clojure:tools.namespace:0.2.11'
+            }
+        }
+    }
+}

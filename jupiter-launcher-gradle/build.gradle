@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id 'com.jfrog.bintray'
+    id 'com.jfrog.bintray' version '1.6'
 }
 
 configurations.all {
