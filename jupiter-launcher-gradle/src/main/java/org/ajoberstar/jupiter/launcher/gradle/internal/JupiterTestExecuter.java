@@ -1,6 +1,5 @@
 package org.ajoberstar.jupiter.launcher.gradle.internal;
 
-import org.ajoberstar.jupiter.launcher.gradle.plugins.JupiterPlugin;
 import org.gradle.api.UncheckedIOException;
 import org.gradle.api.internal.tasks.testing.DefaultTestOutputEvent;
 import org.gradle.api.internal.tasks.testing.TestCompleteEvent;
@@ -14,9 +13,10 @@ import org.gradle.api.tasks.testing.TestResult;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.nio.channels.Channels;
+import java.nio.channels.Pipe;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +26,16 @@ import java.util.regex.Pattern;
 public class JupiterTestExecuter implements TestExecuter {
     @Override
     public void execute(Test test, TestResultProcessor testResultProcessor) {
-        
+        Pipe pipe;
 
-        PipedOutputStream os = new PipedOutputStream();
+        try {
+            pipe = Pipe.open();
+        } catch (IOException e) {
+            throw new UncheckedIOException("Could not open pipe.", e);
+        }
+        OutputStream os = Channels.newOutputStream(pipe.sink());
 
-        Thread handler = new JupiterOutputHandler(os, testResultProcessor);
+        Thread handler = new JupiterOutputHandler(pipe, testResultProcessor);
         handler.start();
 
         test.getProject().javaexec(spec -> {
@@ -50,20 +55,20 @@ public class JupiterTestExecuter implements TestExecuter {
     }
 
     private static class JupiterOutputHandler extends Thread {
-        private final PipedOutputStream os;
+        private final Pipe pipe;
         private final TestResultProcessor testResultProcessor;
 
-        public JupiterOutputHandler(PipedOutputStream os, TestResultProcessor testResultProcessor) {
-            this.os = os;
+        public JupiterOutputHandler(Pipe pipe, TestResultProcessor testResultProcessor) {
+            this.pipe = pipe;
             this.testResultProcessor = testResultProcessor;
         }
 
         public void run() {
-            try (
-                PipedInputStream is = new PipedInputStream(os);
-                InputStreamReader isr = new InputStreamReader(is);
-                BufferedReader reader = new BufferedReader(isr)
-            ) {
+
+            try {
+                Reader channelReader = Channels.newReader(pipe.source(), "UTF-8");
+                BufferedReader reader = new BufferedReader(channelReader);
+
                 JupiterTestDescriptor currentTest = null;
                 boolean testComplete = false;
                 List<String> failureOutput = null;
