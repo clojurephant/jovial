@@ -27,7 +27,6 @@ public class JupiterTestExecuter implements TestExecuter {
     @Override
     public void execute(Test test, TestResultProcessor testResultProcessor) {
         Pipe pipe;
-
         try {
             pipe = Pipe.open();
         } catch (IOException e) {
@@ -70,34 +69,31 @@ public class JupiterTestExecuter implements TestExecuter {
                 BufferedReader reader = new BufferedReader(channelReader);
 
                 JupiterTestDescriptor currentTest = null;
-                boolean testComplete = false;
-                List<String> failureOutput = null;
                 for (String line = ""; line != null; line = reader.readLine()) {
                     System.out.println(line);
+                    JupiterTestDescriptor maybeTest = JupiterTestDescriptor.fromUniqueId(line);
+                    System.out.println("Processing line for: " + (maybeTest != null ? maybeTest.getId() : null));
                     if (line.startsWith("Started:")) {
-                        if (currentTest != null) {
-                            // send off the finish from the previous test
-                            String failMessage = String.join(System.lineSeparator(), failureOutput);
-                            if (failMessage.isEmpty()) {
-                                testResultProcessor.completed(currentTest.getId(), new TestCompleteEvent(Instant.now().toEpochMilli(), TestResult.ResultType.SUCCESS));
-                            } else {
-                                testResultProcessor.failure(currentTest.getId(), new AssertionError(failMessage));
+                        if (maybeTest.getParent() != null && maybeTest.getParent().getParent() != null) {
+                            if (currentTest == null || !maybeTest.getParent().getId().equals(currentTest.getParent().getId())) {
+                                if (currentTest != null) {
+                                    System.out.println("Jupiter Completed Suite: " + currentTest.getParent().getId());
+                                    testResultProcessor.completed(currentTest.getParent().getId(), new TestCompleteEvent(Instant.now().toEpochMilli()));
+                                }
+                                System.out.println("Jupiter Starting Suite: " + maybeTest.getParent().getId());
+                                testResultProcessor.started(maybeTest.getParent(), new TestStartEvent(Instant.now().toEpochMilli()));
                             }
+                            currentTest = maybeTest;
+                            System.out.println("Jupiter Starting Test: " + currentTest.getId());
+                            testResultProcessor.started(currentTest, new TestStartEvent(Instant.now().toEpochMilli(), null));
                         }
-
-                        // set up next test
-                        currentTest = JupiterTestDescriptor.fromUniqueId(line);
-                        testComplete = false;
-                        testResultProcessor.started(currentTest, new TestStartEvent(Instant.now().toEpochMilli(), null));
-                    } else if (line.startsWith("Finished:")) {
-                        testComplete = true;
-                        failureOutput = new ArrayList<>();
-                    } else if (testComplete) {
-                        failureOutput.add(line);
-                    } else if (currentTest != null) {
-                        testResultProcessor.output(currentTest.getId(), new DefaultTestOutputEvent(TestOutputEvent.Destination.StdOut, line));
+                    } else if (line.startsWith("Finished:") && maybeTest.getId().equals(currentTest.getId())) {
+                        System.out.println("Jupiter Completed Test: " + currentTest.getId());
+                        testResultProcessor.completed(currentTest.getId(), new TestCompleteEvent(Instant.now().toEpochMilli()));
                     }
                 }
+                System.out.println("Jupiter Completed Suite: " + currentTest.getParent().getId());
+                testResultProcessor.completed(currentTest.getParent().getId(), new TestCompleteEvent(Instant.now().toEpochMilli()));
             } catch (IOException e) {
                 throw new UncheckedIOException("Problem reading Jupiter output", e);
             }
@@ -125,7 +121,7 @@ public class JupiterTestExecuter implements TestExecuter {
 
         @Override
         public String getClassName() {
-            return null;
+            return isComposite() || parent == null ? this.getName() : parent.getName();
         }
 
         @Override

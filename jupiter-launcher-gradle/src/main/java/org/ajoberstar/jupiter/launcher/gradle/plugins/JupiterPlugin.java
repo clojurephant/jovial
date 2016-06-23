@@ -7,7 +7,6 @@ import org.ajoberstar.jupiter.launcher.gradle.internal.DefaultJupiterTestSuiteSp
 import org.ajoberstar.jupiter.launcher.gradle.internal.JupiterTestExecuter;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.internal.tasks.testing.detection.TestExecuter;
 import org.gradle.api.tasks.testing.Test;
 import org.gradle.jvm.plugins.JvmComponentPlugin;
@@ -17,9 +16,7 @@ import org.gradle.jvm.test.internal.JvmTestSuiteRules;
 import org.gradle.jvm.toolchain.JavaToolChainRegistry;
 import org.gradle.model.Defaults;
 import org.gradle.model.Each;
-import org.gradle.model.Finalize;
 import org.gradle.model.ModelMap;
-import org.gradle.model.ModelSet;
 import org.gradle.model.Mutate;
 import org.gradle.model.RuleSource;
 import org.gradle.model.Validate;
