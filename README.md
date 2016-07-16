@@ -4,7 +4,7 @@
 [![Travis](https://img.shields.io/travis/ajoberstar/jovial.svg?style=flat-square)](https://travis-ci.org/ajoberstar/jovial)
 [![GitHub license](https://img.shields.io/github/license/ajoberstar/jovial.svg?style=flat-square)](https://github.com/ajoberstar/jovial/blob/master/LICENSE)
 
-**DISCLAIMER:** JUnit5 is still in early development. Jovial is currently build on SNAPSHOT versions of JUnit5.
+**DISCLAIMER:** JUnit5 is still in early development. Jovial is currently build on the M1 version of JUnit5.
 
 ## Why do you care?
 
