@@ -24,7 +24,7 @@ repositories {
 dependencies {
     compile 'org.clojure:clojure:1.8.0'
     testCompile 'junit:junit:4.12'
-    testRuntime 'org.ajoberstar.jupiter:jupiter-engine-clojure.test:0.1.1'
+    testRuntime 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.1.1'
     testRuntime 'org.junit:junit4-engine:5.0.0-SNAPSHOT'
 }
 

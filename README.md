@@ -1,10 +1,10 @@
-# jupiter
+# jovial
 
-[![Bintray](https://img.shields.io/bintray/v/ajoberstar/maven/jupiter.svg?style=flat-square)](https://bintray.com/ajoberstar/maven/jupiter/_latestVersion)
-[![Travis](https://img.shields.io/travis/ajoberstar/jupiter.svg?style=flat-square)](https://travis-ci.org/ajoberstar/jupiter)
-[![GitHub license](https://img.shields.io/github/license/ajoberstar/jupiter.svg?style=flat-square)](https://github.com/ajoberstar/jupiter/blob/master/LICENSE)
+[![Bintray](https://img.shields.io/bintray/v/ajoberstar/maven/jovial.svg?style=flat-square)](https://bintray.com/ajoberstar/maven/jovial/_latestVersion)
+[![Travis](https://img.shields.io/travis/ajoberstar/jovial.svg?style=flat-square)](https://travis-ci.org/ajoberstar/jovial)
+[![GitHub license](https://img.shields.io/github/license/ajoberstar/jovial.svg?style=flat-square)](https://github.com/ajoberstar/jovial/blob/master/LICENSE)
 
-**DISCLAIMER:** JUnit5 is still in early development. Jupiter is currently build on SNAPSHOT versions of JUnit5.
+**DISCLAIMER:** JUnit5 is still in early development. Jovial is currently build on SNAPSHOT versions of JUnit5.
 
 ## Why do you care?
 
@@ -18,7 +18,7 @@ All it needs is support from the JVM community to provide:
 
 ## What is it?
 
-Jupiter's main goal is to help provide launchers and engines to extend the support of JUnit5 to new places.
+Jovial's main goal is to help provide launchers and engines to extend the support of JUnit5 to new places.
 
 ### Current Support
 
@@ -32,15 +32,15 @@ Jupiter's main goal is to help provide launchers and engines to extend the suppo
 
 ## Usage
 
-**NOTE:** *All* jupiter modules require Java 8 (or higher).
+**NOTE:** *All* jovial modules require Java 8 (or higher).
 
-* [Release Notes](https://github.com/ajoberstar/jupiter/releases)
-* [Full Documentation](https://github.com/ajoberstar/jupiter/wiki)
+* [Release Notes](https://github.com/ajoberstar/jovial/releases)
+* [Full Documentation](https://github.com/ajoberstar/jovial/wiki)
 
 ### clojure.test
 
 Run JUnit5 through [your favorite method](http://junit.org/junit5/docs/current/user-guide/#running-tests), just make
-sure that you have `org.ajoberstar.jupiter:jupiter-engine-clojure.test` on the classpath.
+sure that you have `org.ajoberstar.jovial:jovial-engine-clojure.test` on the classpath.
 
 See the sample [console](sample-junit-console), [maven](sample-junit-maven), and [gradle](sample-junit-gradle) projects
 for more thorough information.
@@ -51,7 +51,7 @@ for more thorough information.
 
 ## Questions, Bugs, and Features
 
-Please use the repo's [issues](https://github.com/ajoberstar/jupiter/issues)
+Please use the repo's [issues](https://github.com/ajoberstar/jovial/issues)
 for all questions, bug reports, and feature requests.
 
 ## Contributing
@@ -62,7 +62,7 @@ Smaller changes can come directly as a PR, but larger or more complex
 ones should be discussed in an issue first to flesh out the approach.
 
 If you're interested in implementing a feature on the
-[issues backlog](https://github.com/ajoberstar/jupiter/issues), add a comment
+[issues backlog](https://github.com/ajoberstar/jovial/issues), add a comment
 to make sure it's not already in progress and for any needed discussion.
 
 ## Acknowledgements

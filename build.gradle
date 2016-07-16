@@ -10,7 +10,7 @@ buildscript {
 apply plugin: 'org.ajoberstar.semver-vcs-grgit'
 
 allprojects {
-    group = 'org.ajoberstar.jupiter'
+    group = 'org.ajoberstar.jovial'
 
     pluginManager.withPlugin('java') {
         repositories {
@@ -38,14 +38,14 @@ allprojects {
             publish = true
             pkg {
                 repo = 'maven'
-                name = 'jupiter'
+                name = 'jovial'
                 licenses = ['EPL-1.0']
-                websiteUrl = 'https://github.com/ajoberstar/jupiter'
-                issueTrackerUrl = 'https://github.com/ajoberstar/jupiter/issues'
-                vcsUrl = 'https://github.com/ajoberstar/jupiter.git'
+                websiteUrl = 'https://github.com/ajoberstar/jovial'
+                issueTrackerUrl = 'https://github.com/ajoberstar/jovial/issues'
+                vcsUrl = 'https://github.com/ajoberstar/jovial.git'
                 labels = ['junit', 'junit5', 'clojure', 'testing', 'gradle']
                 publicDownloadNumbers = true
-                githubRepo = 'ajoberstar/jupiter'
+                githubRepo = 'ajoberstar/jovial'
 
                 version {
                     name = project.version

@@ -1,3 +1,3 @@
 @echo off
 cmd /c gradlew :installDist --quiet
-cmd /c build\install\jupiter-sample-console\bin\jupiter-sample-console %*
+cmd /c build\install\jovial-sample-console\bin\jovial-sample-console %*

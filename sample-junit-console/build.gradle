@@ -17,5 +17,5 @@ repositories {
 
 dependencies {
     compile 'org.junit:junit-console:5.0.0-SNAPSHOT'
-    compile 'org.ajoberstar.jupiter:jupiter-engine-clojure.test:0.1.1'
+    compile 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.1.1'
 }

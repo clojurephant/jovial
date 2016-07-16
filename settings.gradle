@@ -1,8 +1,8 @@
 // language support
-include 'jupiter-lang-clojure'
+include 'jovial-lang-clojure'
 
 // test engines
-include 'jupiter-engine-clojure.test'
+include 'jovial-engine-clojure.test'
 
 // build/ide launchers
-include 'jupiter-launcher-gradle'
+include 'jovial-launcher-gradle'

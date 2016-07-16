@@ -2,7 +2,7 @@
 
 [Official JUnit Console Docs](http://junit.org/junit5/docs/current/user-guide/#running-tests-console-runner)
 
-This project is set up to create a Java application that has the JUnit launcher API and the Jupiter engines on the
+This project is set up to create a Java application that has the JUnit launcher API and the Jovial engines on the
 classpath. You can run it as follows:
 
 ```
