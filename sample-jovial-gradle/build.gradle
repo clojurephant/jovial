@@ -40,7 +40,7 @@ model {
             dependencies {
 //                module 'org.junit.platform:junit-platform-console:1.0.0-M1'
                 module 'junit:junit:4.12'
-                compile 'org.junit.vintage:junit-vintage-engine:4.12.0-M1'
+                module 'org.junit.vintage:junit-vintage-engine:4.12.0-M1'
                 module 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.2.0-dev.1'
                 module 'org.ajoberstar.jovial:jovial-lang-clojure:0.2.0-dev.1'
                 module 'org.clojure:clojure:1.8.0'
