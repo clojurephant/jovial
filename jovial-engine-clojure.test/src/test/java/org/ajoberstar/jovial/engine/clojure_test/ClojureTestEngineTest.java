@@ -1,15 +1,14 @@
 package org.ajoberstar.jovial.engine.clojure_test;
 
 import org.junit.Test;
-import org.junit.gen5.engine.EngineDiscoveryRequest;
-import org.junit.gen5.engine.TestDescriptor;
-import org.junit.gen5.engine.TestTag;
-import org.junit.gen5.engine.UniqueId;
-import org.junit.gen5.launcher.main.TestDiscoveryRequestBuilder;
+import org.junit.platform.engine.EngineDiscoveryRequest;
+import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.TestTag;
+import org.junit.platform.engine.UniqueId;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,11 +17,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
-import static org.junit.gen5.engine.discovery.ClasspathSelector.selectClasspathRoots;
-import static org.junit.gen5.engine.discovery.UniqueIdSelector.selectUniqueId;
 import static org.ajoberstar.jovial.lang.clojure.NamespaceSelector.selectNamespace;
 import static org.ajoberstar.jovial.lang.clojure.NamespaceFilter.includeNamespacePattern;
 import static org.ajoberstar.jovial.lang.clojure.VarSelector.selectVar;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClasspathRoots;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectUniqueId;
 
 public class ClojureTestEngineTest {
     @Test
@@ -31,7 +30,7 @@ public class ClojureTestEngineTest {
             .map(File::new)
             .collect(Collectors.toSet());
 
-        EngineDiscoveryRequest request = TestDiscoveryRequestBuilder.request()
+        EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectClasspathRoots(roots))
             .build();
         UniqueId root = UniqueId.root("sample", "test");
@@ -56,7 +55,7 @@ public class ClojureTestEngineTest {
 
     @Test
     public void selectingByNamespace() {
-        EngineDiscoveryRequest request = TestDiscoveryRequestBuilder.request()
+        EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectNamespace("sample.other-test"))
             .build();
         UniqueId root = UniqueId.root("sample", "test");
@@ -79,7 +78,7 @@ public class ClojureTestEngineTest {
 
     @Test
     public void selectingByVar() {
-        EngineDiscoveryRequest request = TestDiscoveryRequestBuilder.request()
+        EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectVar("sample.other-test", "my-other-works"))
             .build();
         UniqueId root = UniqueId.root("sample", "test");
@@ -99,7 +98,7 @@ public class ClojureTestEngineTest {
 
     @Test
     public void selectingTestByUniqueId() {
-        EngineDiscoveryRequest request = TestDiscoveryRequestBuilder.request()
+        EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectUniqueId(UniqueId.root("sample", "test").append("namespace", "sample.other-test").append("name", "my-other-works")))
             .build();
         UniqueId root = UniqueId.root("sample", "test");
@@ -119,7 +118,7 @@ public class ClojureTestEngineTest {
 
     @Test
     public void selectingContainerByUniqueId() {
-        EngineDiscoveryRequest request = TestDiscoveryRequestBuilder.request()
+        EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectUniqueId(UniqueId.root("sample", "test").append("namespace", "sample.other-test")))
             .build();
         UniqueId root = UniqueId.root("sample", "test");
@@ -145,7 +144,7 @@ public class ClojureTestEngineTest {
             .map(File::new)
             .collect(Collectors.toSet());
 
-        EngineDiscoveryRequest request = TestDiscoveryRequestBuilder.request()
+        EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectClasspathRoots(roots))
             .filters(includeNamespacePattern(".*other.*"))
             .build();
@@ -172,7 +171,7 @@ public class ClojureTestEngineTest {
             .map(File::new)
             .collect(Collectors.toSet());
 
-        EngineDiscoveryRequest request = TestDiscoveryRequestBuilder.request()
+        EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
             .selectors(selectClasspathRoots(roots))
             .build();
         UniqueId root = UniqueId.root("sample", "test");
@@ -195,7 +194,7 @@ public class ClojureTestEngineTest {
 
     private Set<TestTag> tags(String... tags) {
         return Arrays.stream(tags)
-            .map(TestTag::of)
+            .map(TestTag::create)
             .collect(Collectors.toSet());
     }
 }

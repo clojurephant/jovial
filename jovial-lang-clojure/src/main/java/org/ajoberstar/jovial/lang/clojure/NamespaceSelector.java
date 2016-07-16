@@ -3,7 +3,7 @@ package org.ajoberstar.jovial.lang.clojure;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.Namespace;
-import org.junit.gen5.engine.DiscoverySelector;
+import org.junit.platform.engine.DiscoverySelector;
 
 public class NamespaceSelector implements DiscoverySelector {
     private final Namespace namespace;

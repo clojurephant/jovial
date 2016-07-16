@@ -1,9 +1,9 @@
 (ns org.ajoberstar.jovial.lang.clojure
   (:require [clojure.java.io :as io])
-  (:import (org.junit.gen5.engine.support.descriptor FileSource FilePosition CompositeTestSource)
-           (org.junit.gen5.engine TestSource UniqueId)
-           (clojure.lang Namespace Var)
-           (java.util Optional)))
+  (:import (clojure.lang Namespace Var)
+           (java.util Optional)
+           (org.junit.platform.engine TestSource UniqueId)
+           (org.junit.platform.engine.support.descriptor FilePosition FileSource CompositeTestSource)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

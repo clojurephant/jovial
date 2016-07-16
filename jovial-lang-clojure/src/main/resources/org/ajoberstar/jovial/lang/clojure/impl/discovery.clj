@@ -4,11 +4,11 @@
             [clojure.tools.namespace.find :refer [find-namespaces]]
             [clojure.string :as str])
   (:import (clojure.lang Var Namespace)
-           (org.junit.gen5.engine UniqueId Filter EngineDiscoveryRequest)
            (java.io File)
            (java.nio.file Path)
            (org.ajoberstar.jovial.lang.clojure VarSelector NamespaceSelector NamespaceFilter)
-           (org.junit.gen5.engine.discovery UniqueIdSelector ClasspathSelector ClassSelector)))
+           (org.junit.platform.engine UniqueId EngineDiscoveryRequest Filter DiscoverySelector)
+           (org.junit.platform.engine.discovery UniqueIdSelector ClasspathSelector ClassSelector)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Selecting candidates for discovery
@@ -63,7 +63,7 @@
 
 
 (defn select [^EngineDiscoveryRequest request]
-  (mapcat -select (.getSelectors request)))
+  (mapcat -select (.getSelectorsByType request DiscoverySelector)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Filtering candidates for discovery

@@ -1,8 +1,8 @@
 package org.ajoberstar.jovial.lang.clojure;
 
 import clojure.lang.Namespace;
-import org.junit.gen5.engine.DiscoveryFilter;
-import org.junit.gen5.engine.FilterResult;
+import org.junit.platform.engine.DiscoveryFilter;
+import org.junit.platform.engine.FilterResult;
 
 import java.util.regex.Pattern;
 

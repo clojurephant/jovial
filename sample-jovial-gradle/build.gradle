@@ -38,9 +38,9 @@ model {
             jovialVersion '+'
             jUnitVersion '5.0.0-SNAPSHOT'
             dependencies {
-//                module 'org.junit:junit-console:5.0.0-SNAPSHOT'
+//                module 'org.junit.platform:junit-platform-console:1.0.0-M1'
                 module 'junit:junit:4.12'
-                module 'org.junit:junit4-engine:5.0.0-SNAPSHOT'
+                compile 'org.junit.vintage:junit-vintage-engine:4.12.0-M1'
                 module 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.2.0-dev.1'
                 module 'org.ajoberstar.jovial:jovial-lang-clojure:0.2.0-dev.1'
                 module 'org.clojure:clojure:1.8.0'

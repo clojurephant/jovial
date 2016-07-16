@@ -2,7 +2,7 @@ plugins {
     id 'application'
 }
 
-mainClassName = 'org.junit.gen5.console.ConsoleRunner'
+mainClassName = 'org.junit.platform.console.ConsoleLauncher'
 
 repositories {
     repositories {
@@ -11,11 +11,12 @@ repositories {
             name = 'sonatype-snapshots'
             url = 'https://oss.sonatype.org/content/repositories/snapshots'
         }
+        mavenLocal()
     }
 }
 
 
 dependencies {
-    compile 'org.junit:junit-console:5.0.0-SNAPSHOT'
-    compile 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.1.1'
+    compile 'org.junit.platform:junit-platform-console:1.0.0-M1'
+    compile 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.2.0-dev.1'
 }

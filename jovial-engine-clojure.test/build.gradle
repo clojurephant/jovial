@@ -5,12 +5,12 @@ plugins {
 }
 
 dependencies {
-    compile 'org.junit:junit-engine-api:5.0.0-SNAPSHOT'
+    compile 'org.junit.platform:junit-platform-engine:1.0.0-M1'
     compile 'org.clojure:clojure:1.9.0-alpha5'
     compile project(':jovial-lang-clojure')
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.junit:junit-launcher:5.0.0-SNAPSHOT'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.0.0-M1'
 }
 
 task sourcesJar(type: Jar) {

@@ -3,10 +3,10 @@
             [org.ajoberstar.jovial.lang.clojure.engine :as engine]
             [clojure.test :as test]
             [clojure.stacktrace :as stack])
-  (:import (org.junit.gen5.engine ConfigurationParameters TestExecutionResult TestTag)
-           (org.junit.gen5.engine.support.descriptor EngineDescriptor)
-           (org.ajoberstar.jovial.engine.clojure_test ClojureTestEngine ClojureTestDescriptor)
-           (org.opentest4j AssertionFailedError)))
+  (:import (org.ajoberstar.jovial.engine.clojure_test ClojureTestEngine ClojureTestDescriptor)
+           (org.opentest4j AssertionFailedError)
+           (org.junit.platform.engine TestTag TestExecutionResult ConfigurationParameters)
+           (org.junit.platform.engine.support.descriptor EngineDescriptor)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -25,7 +25,7 @@
                  (map first)
                  (remove excluded-tags)
                  (map name)
-                 (map #(TestTag/of %)))]
+                 (map #(TestTag/create %)))]
     (into #{} xf full-meta)))
 
 (defn- var->descriptor [{:keys [var source]}]

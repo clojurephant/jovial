@@ -1,12 +1,12 @@
 package org.ajoberstar.jovial.lang.clojure;
 
 import org.ajoberstar.jovial.lang.clojure.util.SimpleClojure;
-import org.junit.gen5.engine.ConfigurationParameters;
-import org.junit.gen5.engine.EngineDiscoveryRequest;
-import org.junit.gen5.engine.ExecutionRequest;
-import org.junit.gen5.engine.TestDescriptor;
-import org.junit.gen5.engine.TestEngine;
-import org.junit.gen5.engine.UniqueId;
+import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.platform.engine.EngineDiscoveryRequest;
+import org.junit.platform.engine.ExecutionRequest;
+import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.TestEngine;
+import org.junit.platform.engine.UniqueId;
 
 public abstract class BaseClojureEngine implements TestEngine {
     private static final String ENGINE_NS = "org.ajoberstar.jovial.lang.clojure.engine";

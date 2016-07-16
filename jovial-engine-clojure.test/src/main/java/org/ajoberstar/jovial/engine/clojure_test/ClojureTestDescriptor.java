@@ -1,28 +1,21 @@
 package org.ajoberstar.jovial.engine.clojure_test;
 
-import org.junit.gen5.engine.TestSource;
-import org.junit.gen5.engine.TestTag;
-import org.junit.gen5.engine.UniqueId;
-import org.junit.gen5.engine.support.descriptor.AbstractTestDescriptor;
+import org.junit.platform.engine.TestSource;
+import org.junit.platform.engine.TestTag;
+import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 public class ClojureTestDescriptor extends AbstractTestDescriptor {
-    private final String displayName;
     private final Set<TestTag> tags;
 
     public ClojureTestDescriptor(UniqueId id, String displayName, Set<TestTag> tags, TestSource source) {
-        super(id);
-        this.displayName = displayName;
+        super(id, displayName);
         this.tags = tags;
         setSource(source);
-    }
-
-    @Override
-    public String getDisplayName() {
-        return displayName;
     }
 
     @Override
