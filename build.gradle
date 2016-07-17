@@ -9,6 +9,16 @@ buildscript {
 
 apply plugin: 'org.ajoberstar.semver-vcs-grgit'
 
+plugins {
+    id 'org.sonarqube' version '2.0.1'
+}
+
+sonarqube {
+    properties {
+        property 'sonar.projectVersion', version.toString().split('-')[0]
+    }
+}
+
 allprojects {
     group = 'org.ajoberstar.jovial'
 
