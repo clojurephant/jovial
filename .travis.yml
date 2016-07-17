@@ -4,7 +4,7 @@ dist: trusty
 install: ""
 script: ./travis.sh
 jdk:
-    - openjdk8
+    - oraclejdk8
 cache:
     directories:
         - $HOME/.gradle/caches
