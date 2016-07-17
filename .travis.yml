@@ -1,9 +1,8 @@
 language: java
 sudo: false
+dist: trusty
 install: ""
 script: ./travis.sh
-jdk:
-    - oraclejdk8
 cache:
     directories:
         - $HOME/.gradle/caches
