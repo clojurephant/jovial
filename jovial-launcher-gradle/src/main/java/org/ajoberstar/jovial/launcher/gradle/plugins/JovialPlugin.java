@@ -76,7 +76,7 @@ public class JovialPlugin implements Plugin<Project> {
             JovialTestSuiteSpec testSuite = binary.getTestSuite();
             binary.setJovialVersion(testSuite.getJovialVersion());
             binary.setjUnitVersion(testSuite.getjUnitVersion());
-            binary.getDependencies().add(new DefaultModuleDependencySpec("org.junit", "junit-console", testSuite.getjUnitVersion()));
+            binary.getDependencies().add(new DefaultModuleDependencySpec("org.ajoberstar.jovial", "jovial-launcher-socket", testSuite.getJovialVersion()));
             // TODO add dependencies to the binary in a finalize
         }
 

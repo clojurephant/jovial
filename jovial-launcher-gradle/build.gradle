@@ -11,6 +11,7 @@ configurations.all {
 
 dependencies {
     compile gradleApi()
+    compileOnly 'org.junit.platform:junit-platform-launcher:1.0.0-M1'
 
     testCompile 'junit:junit:4.12'
     testCompile gradleTestKit()

@@ -38,7 +38,8 @@ model {
             jovialVersion '+'
             jUnitVersion '5.0.0-SNAPSHOT'
             dependencies {
-//                module 'org.junit.platform:junit-platform-console:1.0.0-M1'
+                module 'org.junit.platform:junit-platform-launcher:1.0.0-M1'
+                module 'org.junit.platform:junit-platform-engine:1.0.0-M1'
                 module 'junit:junit:4.12'
                 module 'org.junit.vintage:junit-vintage-engine:4.12.0-M1'
                 module 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.2.0-dev.1'
