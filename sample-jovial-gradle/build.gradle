@@ -49,4 +49,12 @@ model {
             }
         }
     }
+    tasks {
+        testBinaryTest {
+            beforeSuite { println "Before Suite: $it" }
+            afterSuite { println "After Suite: $it" }
+            beforeTest { println "Before Test: $it" }
+            afterTest { println "After Test: $it" }
+        }
+    }
 }

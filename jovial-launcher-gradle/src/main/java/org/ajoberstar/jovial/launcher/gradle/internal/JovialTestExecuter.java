@@ -144,9 +144,15 @@ public class JovialTestExecuter implements TestExecuter {
         }
 
         private void handleEvent(Map<String, Object> event) {
+            // Gradle seems to only allow two tiers of tests, so drop the roots
+            if (event.get("parentId") == null) {
+                return;
+            }
+
             JovialTestDescriptor descriptor = descriptors.computeIfAbsent((String) event.get("uniqueId"), uniqueId -> {
-                JovialTestDescriptor parent = descriptors.get((String) event.get("parentId"));
-                return new JovialTestDescriptor(uniqueId, parent, (String) event.get("displayName"), (boolean) event.get("container"));
+                boolean container = (boolean) event.get("container");
+                JovialTestDescriptor parent = container ? null : descriptors.get((String) event.get("parentId"));
+                return new JovialTestDescriptor(uniqueId, parent, (String) event.get("displayName"), container);
             });
 
             switch ((String) event.get("type")) {
@@ -228,6 +234,26 @@ public class JovialTestExecuter implements TestExecuter {
         @Override
         public Object getOwnerBuildOperationId() {
             return null;
+        }
+
+        @Override
+        public String toString() {
+            return id.toString();
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof JovialTestDescriptor) {
+                JovialTestDescriptor that = (JovialTestDescriptor) other;
+                return this.id.equals(that.id);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return id.hashCode();
         }
     }
 }

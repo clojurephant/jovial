@@ -120,8 +120,10 @@
               *descs* (descriptors descriptor)
               *current-desc* (atom nil)
               test/report listener-report]
+      (.executionStarted *listener* descriptor)
       (let [selected-vars (keys *descs*)]
-        (test/test-vars selected-vars)))))
+        (test/test-vars selected-vars))
+      (.executionFinished *listener* descriptor (TestExecutionResult/successful)))))
 
 (defn engine [^ConfigurationParameters config]
   ;; could support config at some point
