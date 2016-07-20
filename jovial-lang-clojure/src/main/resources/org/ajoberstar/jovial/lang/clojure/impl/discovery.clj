@@ -13,7 +13,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Selecting candidates for discovery
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defrecord TestCandidate [namespace var source])
+(defrecord TestCandidate [namespace var])
 
 (defprotocol Selector
   (-select [this] "Selects a seq of TestCandidates for discovery of tests."))
@@ -24,7 +24,7 @@
   Object
   (-select [_] nil)
   Var
-  (-select [var] [(->TestCandidate (-> var meta :ns) var (lang/var-source var))])
+  (-select [var] [(->TestCandidate (-> var meta :ns) var)])
   Namespace
   (-select [ns]
     (->> ns ns-interns vals (mapcat -select)))

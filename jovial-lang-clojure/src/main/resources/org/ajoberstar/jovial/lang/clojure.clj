@@ -2,7 +2,7 @@
   (:require [clojure.java.io :as io])
   (:import (clojure.lang Namespace Var)
            (java.util Optional)
-           (org.junit.platform.engine TestSource UniqueId)
+           (org.junit.platform.engine TestSource TestTag UniqueId)
            (org.junit.platform.engine.support.descriptor FilePosition FileSource CompositeTestSource)))
 
 
@@ -96,16 +96,17 @@
       (-> opt .get ->ref))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Friendly name conversion
+;; Other utilities
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defprotocol Friendly
-  (->friendly [this] "Converts this to a friendly name."))
+(def ^:private excluded-tags #{:ns :file :line :column :doc :author :test :name})
 
-(extend-protocol Friendly
-  nil
-  (->friendly [_] nil)
-  Namespace
-  (->friendly [ns] (str ns))
-  Var
-  (->friendly [var]
-    (-> var meta :name str)))
+(defn- tags [var]
+  (let [var-meta (-> var meta)
+        ns-meta (-> var-meta :ns meta)
+        full-meta (merge ns-meta var-meta)
+        xf (comp (filter second) ; if meta value is truthy, use it as a tag
+                 (map first) ; just need the keyword
+                 (remove excluded-tags) ; these are unlikely to be meant as a tag
+                 (map name)
+                 (map #(TestTag/create %)))]
+    (into #{} xf full-meta)))

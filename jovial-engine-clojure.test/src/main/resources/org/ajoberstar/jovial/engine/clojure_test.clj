@@ -3,11 +3,11 @@
             [org.ajoberstar.jovial.lang.clojure.engine :as engine]
             [clojure.test :as test]
             [clojure.stacktrace :as stack])
-  (:import (org.ajoberstar.jovial.engine.clojure_test ClojureTestEngine ClojureTestDescriptor)
+  (:import (org.ajoberstar.jovial.engine.clojure_test ClojureTestEngine ClojureNamespaceDescriptor ClojureVarDescriptor)
            (org.opentest4j AssertionFailedError)
-           (org.junit.platform.engine TestTag TestExecutionResult ConfigurationParameters)
+           (org.junit.platform.engine TestTag TestDescriptor TestExecutionResult ConfigurationParameters)
+           (org.junit.platform.engine.reporting ReportEntry)
            (org.junit.platform.engine.support.descriptor EngineDescriptor)))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Discover support
@@ -15,58 +15,46 @@
 (defn- test? [cand]
   (-> cand :var meta :test))
 
-(def ^:private excluded-tags #{:ns :file :line :column :doc :author :test :name})
-
-(defn- tags [var]
-  (let [var-meta (-> var meta)
-        ns-meta (-> var-meta :ns meta)
-        full-meta (merge ns-meta var-meta)
-        xf (comp (filter second)
-                 (map first)
-                 (remove excluded-tags)
-                 (map name)
-                 (map #(TestTag/create %)))]
-    (into #{} xf full-meta)))
-
-(defn- var->descriptor [{:keys [var source]}]
-  (ClojureTestDescriptor. (lang/->id var) (lang/->friendly var) (tags var) source))
+(defn- var->descriptor [{:keys [var]}]
+  (ClojureVarDescriptor. (lang/->id var) var))
 
 (defn- ns->descriptor [[ns candidates]]
-  (let [ns-desc (ClojureTestDescriptor. (lang/->id ns) (lang/->friendly ns) (tags ns) (lang/ns-source ns))]
+  (let [ns-desc (ClojureNamespaceDescriptor. (lang/->id ns) ns)]
     (doseq [var-desc (map var->descriptor candidates)]
       (.addChild ns-desc var-desc))
     ns-desc))
 
+(defn- do-discover [root-id candidates]
+  (binding [lang/*root-id* root-id]
+    (let [engine-desc (EngineDescriptor. root-id ClojureTestEngine/ENGINE_ID)
+          ns-descs (->> candidates
+                        (filter test?)
+                        (group-by :namespace)
+                        (map ns->descriptor))]
+      (doseq [ns-desc ns-descs]
+        (.addChild engine-desc ns-desc))
+      engine-desc)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Execute support
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def ^:dynamic *listener* nil)
+(def ^:dynamic *throwable* nil)
+(def ^:dynamic *entries* nil)
 
-(def ^:dynamic *descs* nil)
+(defmulti jovial-report :type)
 
-(def ^:dynamic *current-desc* nil)
+;; ignore these ones, since we're handling on our own
+(defmethod jovial-report :begin-test-ns [m])
+(defmethod jovial-report :end-test-ns [m])
+(defmethod jovial-report :begin-test-var [m])
+(defmethod jovial-report :end-test-var [m])
 
-(defn descriptors [root]
-  (let [xf (map (fn [desc] [(-> desc .getSource lang/->ref) desc]))]
-    (into {} xf (.getAllDescendants root))))
+;; success doesn't need to be reported
+(defmethod jovial-report :pass [m])
 
-(defmulti listener-report :type)
-
-(defmethod listener-report :begin-test-var [m]
-  (let [desc (->> m :var (get *descs*))]
-    (reset! *current-desc* desc)
-    (.executionStarted *listener* desc)))
-
-(defmethod listener-report :end-test-var [m]
-  (reset! *current-desc* nil))
-
-(defmethod listener-report :pass [m]
-  (let [desc @*current-desc*
-        result (TestExecutionResult/successful)]
-    (.executionFinished *listener* desc result)))
-
-(defn- ex-fail [{:keys [message expected actual] :as m}]
-  (let [msg (with-out-str
+(defmethod jovial-report :fail [m]
+  (let [{:keys [message expected actual]}  m
+        msg (with-out-str
               (println "FAIL in " (test/testing-vars-str m))
               (when (seq test/*testing-contexts*)
                 (println (test/testing-contexts-str)))
@@ -74,15 +62,11 @@
                 (println message))
               (println "expected: " expected)
               (println "  actual: " actual))]
-    (AssertionFailedError. msg expected actual)))
+    (reset! *throwable* (AssertionFailedError. msg expected actual))))
 
-(defmethod listener-report :fail [m]
-  (let [desc @*current-desc*
-        result (TestExecutionResult/failed (ex-fail m))]
-    (.executionFinished *listener* desc result)))
-
-(defn- ex-error [{:keys [message expected actual] :as m}]
-  (let [msg (with-out-str
+(defmethod jovial-report :error [m]
+  (let [{:keys [message expected actual]} m
+        msg (with-out-str
               (println "ERROR in " (test/testing-vars-str m))
               (when (seq test/*testing-contexts*)
                 (println (test/testing-contexts-str)))
@@ -91,14 +75,61 @@
               (println "expected: " expected)
               (print "  actual: ")
               (stack/print-cause-trace actual test/*stack-trace-depth*))]
-    (AssertionFailedError. msg actual)))
+    (reset! *throwable* (AssertionFailedError. msg actual))))
 
-(defmethod listener-report :error [m]
-  (let [desc @*current-desc*
-        result (TestExecutionResult/failed (ex-error m))]
-    (.executionFinished *listener* desc result)))
+(defmethod jovial-report :default [m]
+  (swap! *entries* conj (ReportEntry/from (dissoc m :type))))
 
-(defmethod listener-report :default [_] nil)
+(declare try-execute)
+
+(defprotocol Fixture
+  (-fixture [desc]))
+
+(extend-protocol Fixture
+  Object
+  (-fixture [desc]
+    (fn [f] (f)))
+  ClojureVarDescriptor
+  (-fixture [desc]
+    (-> desc .getNamespace meta ::test/each-fixtures test/join-fixtures))
+  ClojureNamespaceDescriptor
+  (-fixture [desc]
+    (-> desc .getNamespace meta ::test/once-fixtures test/join-fixtures)))
+
+(defprotocol Test
+  (-test [desc listener]))
+
+(extend-protocol Test
+  TestDescriptor
+  (-test [desc listener]
+    (fn []
+      (doseq [child (.getChildren desc)]
+        (try-execute child listener))))
+  ClojureVarDescriptor
+  (-test [desc _]
+    (let [test (-> desc .getVar meta :test)]
+      (fn []
+        (binding [test/*testing-vars* (conj test/*testing-vars* (.getVar desc))]
+          (test))))))
+
+(defn try-execute [descriptor listener]
+  (binding [*throwable* (atom nil)
+            *entries* (atom [])
+            test/report jovial-report]
+    (try
+      (.executionStarted listener descriptor)
+      (let [fixture (-fixture descriptor)
+            test (-test descriptor listener)]
+        (fixture
+          (fn []
+            (test))))
+      (catch Exception e
+        (reset! *throwable* e)))
+    (doseq [entry @*entries*]
+      (.reportingEntryPublished listener descriptor entry))
+    (let [e @*throwable*
+          result (if e (TestExecutionResult/failed e) (TestExecutionResult/successful))]
+      (.executionFinished listener descriptor result))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; High-level
@@ -106,24 +137,9 @@
 (defrecord Engine []
   engine/Engine
   (-discover [_ root-id candidates]
-    (binding [lang/*root-id* root-id]
-      (let [engine-desc (EngineDescriptor. root-id ClojureTestEngine/ENGINE_ID)
-            ns-descs (->> candidates
-                          (filter test?)
-                          (group-by :namespace)
-                          (map ns->descriptor))]
-        (doseq [ns-desc ns-descs]
-          (.addChild engine-desc ns-desc))
-        engine-desc)))
+    (do-discover root-id candidates))
   (-execute [_ descriptor listener]
-    (binding [*listener* listener
-              *descs* (descriptors descriptor)
-              *current-desc* (atom nil)
-              test/report listener-report]
-      (.executionStarted *listener* descriptor)
-      (let [selected-vars (keys *descs*)]
-        (test/test-vars selected-vars))
-      (.executionFinished *listener* descriptor (TestExecutionResult/successful)))))
+    (try-execute descriptor listener)))
 
 (defn engine [^ConfigurationParameters config]
   ;; could support config at some point
