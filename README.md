@@ -2,6 +2,7 @@
 
 [![Bintray](https://img.shields.io/bintray/v/ajoberstar/maven/jovial.svg?style=flat-square)](https://bintray.com/ajoberstar/maven/jovial/_latestVersion)
 [![Travis](https://img.shields.io/travis/ajoberstar/jovial.svg?style=flat-square)](https://travis-ci.org/ajoberstar/jovial)
+[![Quality Gate](https://sonarqube.ajoberstar.com/api/badges/gate?key=org.ajoberstar.jovial:jovial)](https://sonarqube.ajoberstar.com/dashboard/index/org.ajoberstar.jovial:jovial)
 [![GitHub license](https://img.shields.io/github/license/ajoberstar/jovial.svg?style=flat-square)](https://github.com/ajoberstar/jovial/blob/master/LICENSE)
 
 **DISCLAIMER:** JUnit5 is still in early development. Jovial is currently build on the M1 version of JUnit5.
