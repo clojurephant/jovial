@@ -1,22 +1,6 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'org.ajoberstar:semver-vcs-gradle-grgit:0.1.0'
-    }
-}
-
 plugins {
-    id 'org.sonarqube' version '2.1'
-}
-
-apply plugin: 'org.ajoberstar.semver-vcs-grgit'
-
-sonarqube {
-    properties {
-        property 'sonar.projectVersion', version.toString().split('-')[0]
-    }
+    id 'org.ajoberstar.defaults' version '0.8.3'
+    id 'gradle-clojure.clojure' version '0.3.1' apply false
 }
 
 allprojects {
@@ -25,43 +9,14 @@ allprojects {
     pluginManager.withPlugin('java') {
         repositories {
             jcenter()
-            maven {
-                name = 'sonatype-snapshots'
-                url = 'https://oss.sonatype.org/content/repositories/snapshots'
-            }
         }
     }
 
-    pluginManager.withPlugin('maven-publish') {
-        publishing {
-            repositories {
-                mavenLocal()
-            }
-        }
-    }
-
-    pluginManager.withPlugin('com.jfrog.bintray') {
+    model {
         bintray {
-            user = System.env['BINTRAY_USER']
-            key = System.env['BINTRAY_KEY']
-            publications = ['main']
-            publish = true
-            pkg {
-                repo = 'maven'
-                name = 'jovial'
-                licenses = ['EPL-1.0']
-                websiteUrl = 'https://github.com/ajoberstar/jovial'
-                issueTrackerUrl = 'https://github.com/ajoberstar/jovial/issues'
-                vcsUrl = 'https://github.com/ajoberstar/jovial.git'
-                labels = ['junit', 'junit5', 'clojure', 'testing', 'gradle']
-                publicDownloadNumbers = true
-                githubRepo = 'ajoberstar/jovial'
-
-                version {
-                    name = project.version
-                    vcsTag = project.version
-                }
-            }
+            owner = 'ajoberstar'
+            repo = 'maven'
+            pkg = 'jovial'
         }
     }
 }
