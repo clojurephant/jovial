@@ -10,13 +10,13 @@ allprojects {
         repositories {
             jcenter()
         }
-    }
 
-    model {
-        bintray {
-            owner = 'ajoberstar'
-            repo = 'maven'
-            pkg = 'jovial'
+        model {
+            bintray {
+                owner = 'ajoberstar'
+                repo = 'maven'
+                pkg = 'jovial'
+            }
         }
     }
 }
