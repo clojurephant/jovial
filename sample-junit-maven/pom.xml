@@ -4,22 +4,14 @@
     <!-- The Basics -->
     <groupId>com.ajoberstar.jovial.sample</groupId>
     <artifactId>sample-junit-maven</artifactId>
-    <version>0.1.1</version>
+    <version>0.0.0</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>org.clojure</groupId>
             <artifactId>clojure</artifactId>
-            <version>1.8.0</version>
+            <version>1.9.0</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.ajoberstar.jovial</groupId>
-            <artifactId>jovial-engine-clojure.test</artifactId>
-            <version>0.1.1</version>
-            <scope>test</scope>
-        </dependency>
-        -->
     </dependencies>
 
     <repositories>
@@ -35,28 +27,39 @@
             </snapshots>
         </repository>
         <repository>
-            <id>snapshots-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>jcenter</id>
+            <url>http://jcenter.bintray.com/</url>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
     </repositories>
 
     <pluginRepositories>
-        <pluginRepository>
-            <id>snapshots-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
+      <!-- temporary until linked to jcenter -->
+      <pluginRepository>
+          <id>ajoberstar</id>
+          <url>http://dl.bintray.com/ajoberstar/maven</url>
+          <releases>
+              <enabled>true</enabled>
+          </releases>
+          <snapshots>
+              <enabled>false</enabled>
+          </snapshots>
+      </pluginRepository>
+      <pluginRepository>
+          <id>jcenter</id>
+          <url>http://jcenter.bintray.com/</url>
+          <releases>
+              <enabled>true</enabled>
+          </releases>
+          <snapshots>
+              <enabled>false</enabled>
+          </snapshots>
+      </pluginRepository>
     </pluginRepositories>
 
     <!-- Build Settings -->
@@ -64,17 +67,17 @@
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19</version>
+                <version>2.19.1</version>
                 <dependencies>
                     <dependency>
-                        <groupId>org.junit</groupId>
-                        <artifactId>surefire-junit5</artifactId>
-                        <version>5.0.0-SNAPSHOT</version>
+                        <groupId>org.junit.platform</groupId>
+                        <artifactId>junit-platform-surefire-provider</artifactId>
+                        <version>1.1.0</version>
                     </dependency>
                     <dependency>
                         <groupId>org.ajoberstar.jovial</groupId>
                         <artifactId>jovial-engine-clojure.test</artifactId>
-                        <version>0.2.0-dev.1</version>
+                        <version>0.2.0-rc.2</version>
                     </dependency>
                 </dependencies>
                 <configuration>
