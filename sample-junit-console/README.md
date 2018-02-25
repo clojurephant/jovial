@@ -18,7 +18,7 @@ There are sample `clojure.test` tests in the `clojure.test` directory. Just add 
 as follows:
 
 ```
-./junit-console -p clojure-test -a
+./junit-console --cp clojure.test
 ```
 
 You'll see the basic console output from JUnit with any failures or messages from `clojure.test`.
