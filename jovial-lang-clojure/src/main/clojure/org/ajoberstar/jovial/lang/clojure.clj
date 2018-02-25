@@ -47,11 +47,11 @@
 
 (defn var-source [var]
   (let [{:keys [ns name file line column]} (meta var)
-        file-pos (if (and line column) (FilePosition. line column))
-        file (if file (FileSource. (io/file *root-dir* file) file-pos))
+        file-pos (if (and line column) (FilePosition/from line column))
+        file (if file (FileSource/from (io/file *root-dir* file) file-pos))
         var (->ClojureVarSource (str ns) (str name))]
     (if file
-      (CompositeTestSource. [var file])
+      (CompositeTestSource/from [var file])
       var)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

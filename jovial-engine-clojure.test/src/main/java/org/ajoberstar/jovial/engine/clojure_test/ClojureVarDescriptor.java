@@ -19,19 +19,22 @@ import clojure.lang.Namespace;
 import clojure.lang.Var;
 import java.util.Set;
 import org.ajoberstar.jovial.lang.clojure.util.SimpleClojure;
+import org.junit.platform.engine.TestDescriptor.Type;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
-public class ClojureVarDescriptor extends AbstractTestDescriptor {
+public final class ClojureVarDescriptor extends AbstractTestDescriptor {
   private final Var var;
   private final Set<TestTag> tags;
 
   public ClojureVarDescriptor(UniqueId id, Var var) {
-    super(id, var.sym.getName());
+    super(
+        id,
+        var.sym.getName(),
+        SimpleClojure.invoke("org.ajoberstar.jovial.lang.clojure", "var-source", var));
     this.var = var;
     this.tags = SimpleClojure.invoke("org.ajoberstar.jovial.lang.clojure", "tags", var);
-    setSource(SimpleClojure.invoke("org.ajoberstar.jovial.lang.clojure", "var-source", var));
   }
 
   public Var getVar() {
@@ -43,13 +46,8 @@ public class ClojureVarDescriptor extends AbstractTestDescriptor {
   }
 
   @Override
-  public boolean isContainer() {
-    return false;
-  }
-
-  @Override
-  public boolean isTest() {
-    return true;
+  public Type getType() {
+    return Type.TEST;
   }
 
   @Override

@@ -23,6 +23,8 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectUniqueId;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +42,9 @@ import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 public class ClojureTestEngineTest {
   @Test
   public void selectingByClasspathDir() {
-    Set<File> roots =
+    Set<Path> roots =
         Arrays.stream(System.getProperty("classpath.roots").split(File.pathSeparator))
-            .map(File::new)
+            .map(Paths::get)
             .collect(Collectors.toSet());
 
     EngineDiscoveryRequest request =
@@ -63,7 +65,7 @@ public class ClojureTestEngineTest {
     TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
     List<UniqueId> actualIds =
         descriptor
-            .getAllDescendants()
+            .getDescendants()
             .stream()
             .map(TestDescriptor::getUniqueId)
             .collect(Collectors.toList());
@@ -90,7 +92,7 @@ public class ClojureTestEngineTest {
     TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
     List<UniqueId> actualIds =
         descriptor
-            .getAllDescendants()
+            .getDescendants()
             .stream()
             .map(TestDescriptor::getUniqueId)
             .collect(Collectors.toList());
@@ -115,7 +117,7 @@ public class ClojureTestEngineTest {
     TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
     List<UniqueId> actualIds =
         descriptor
-            .getAllDescendants()
+            .getDescendants()
             .stream()
             .map(TestDescriptor::getUniqueId)
             .collect(Collectors.toList());
@@ -144,7 +146,7 @@ public class ClojureTestEngineTest {
     TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
     List<UniqueId> actualIds =
         descriptor
-            .getAllDescendants()
+            .getDescendants()
             .stream()
             .map(TestDescriptor::getUniqueId)
             .collect(Collectors.toList());
@@ -173,7 +175,7 @@ public class ClojureTestEngineTest {
     TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
     List<UniqueId> actualIds =
         descriptor
-            .getAllDescendants()
+            .getDescendants()
             .stream()
             .map(TestDescriptor::getUniqueId)
             .collect(Collectors.toList());
@@ -183,9 +185,9 @@ public class ClojureTestEngineTest {
 
   @Test
   public void filteringByNamespace() {
-    Set<File> roots =
+    Set<Path> roots =
         Arrays.stream(System.getProperty("classpath.roots").split(File.pathSeparator))
-            .map(File::new)
+            .map(Paths::get)
             .collect(Collectors.toSet());
 
     EngineDiscoveryRequest request =
@@ -206,7 +208,7 @@ public class ClojureTestEngineTest {
     TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
     List<UniqueId> actualIds =
         descriptor
-            .getAllDescendants()
+            .getDescendants()
             .stream()
             .map(TestDescriptor::getUniqueId)
             .collect(Collectors.toList());
@@ -216,9 +218,9 @@ public class ClojureTestEngineTest {
 
   @Test
   public void getsTagsFromMetadata() {
-    Set<File> roots =
+    Set<Path> roots =
         Arrays.stream(System.getProperty("classpath.roots").split(File.pathSeparator))
-            .map(File::new)
+            .map(Paths::get)
             .collect(Collectors.toSet());
 
     EngineDiscoveryRequest request =
@@ -245,7 +247,7 @@ public class ClojureTestEngineTest {
     TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
     Map<UniqueId, Set<TestTag>> actualTags =
         descriptor
-            .getAllDescendants()
+            .getDescendants()
             .stream()
             .collect(Collectors.toMap(TestDescriptor::getUniqueId, TestDescriptor::getTags));
 

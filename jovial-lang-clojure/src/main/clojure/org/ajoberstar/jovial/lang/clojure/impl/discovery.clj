@@ -5,10 +5,11 @@
             [clojure.string :as str])
   (:import (clojure.lang Var Namespace)
            (java.io File)
-           (java.nio.file Path)
+           (java.nio.file Path Paths)
+           (java.net URI)
            (org.ajoberstar.jovial.lang.clojure VarSelector NamespaceSelector NamespaceFilter)
            (org.junit.platform.engine UniqueId EngineDiscoveryRequest Filter DiscoverySelector)
-           (org.junit.platform.engine.discovery UniqueIdSelector ClasspathSelector ClassSelector)))
+           (org.junit.platform.engine.discovery UniqueIdSelector ClasspathRootSelector ClassSelector)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Selecting candidates for discovery
@@ -37,6 +38,8 @@
         (->> [dir] find-namespaces (map sym->ns) (mapcat -select)))))
   Path
   (-select [dir] (-select (.toFile dir)))
+  URI
+  (-select [uri] (-select (Paths/get uri)))
   Class
   (-select [clazz]
     (let [clazz-name (.getCanonicalName clazz)
@@ -56,11 +59,10 @@
   (-select [selector] (-select (.getNamespace selector)))
   UniqueIdSelector
   (-select [selector] (-select (.getUniqueId selector)))
-  ClasspathSelector
+  ClasspathRootSelector
   (-select [selector] (-select (.getClasspathRoot selector)))
   ClassSelector
   (-select [selector] (-select (.getJavaClass selector))))
-
 
 (defn select [^EngineDiscoveryRequest request]
   (mapcat -select (.getSelectorsByType request DiscoverySelector)))
@@ -69,7 +71,7 @@
 ;; Filtering candidates for discovery
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- ns-filter [request candidates]
-  (let [filters (.getDiscoveryFiltersByType request NamespaceFilter)
+  (let [filters (.getFiltersByType request NamespaceFilter)
         unified (Filter/composeFilters filters)
         included? (fn [cand] (->> cand :namespace (.apply unified) .included))]
     (clojure.core/filter included? candidates)))
