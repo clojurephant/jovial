@@ -3,7 +3,3 @@ include 'jovial-lang-clojure'
 
 // test engines
 include 'jovial-engine-clojure.test'
-
-// build/ide launchers
-include 'jovial-launcher-socket'
-include 'jovial-launcher-gradle'
