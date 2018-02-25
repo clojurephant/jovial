@@ -2,7 +2,6 @@
 
 [![Download](https://api.bintray.com/packages/ajoberstar/maven/jovial/images/download.svg)](https://bintray.com/ajoberstar/maven/jovial/_latestVersion)
 [![Travis](https://img.shields.io/travis/ajoberstar/jovial.svg?style=flat-square)](https://travis-ci.org/ajoberstar/jovial)
-[![GitHub license](https://img.shields.io/github/license/ajoberstar/jovial.svg?style=flat-square)](https://github.com/ajoberstar/jovial/blob/master/LICENSE)
 
 ## Why do you care?
 
