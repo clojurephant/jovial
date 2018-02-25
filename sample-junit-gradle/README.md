@@ -10,7 +10,7 @@ Sample `clojure.test` tests are included in the `src/test/resources` directory.
 Run the tests with:
 
 ```
-./gradlew junit5Test
+./gradlew junitPlatformTest
 ```
 
 You'll see the basic console output from JUnit with any failures or messages from `clojure.test`.
