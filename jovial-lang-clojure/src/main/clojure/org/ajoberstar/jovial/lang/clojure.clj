@@ -100,7 +100,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (def ^:private excluded-tags #{:ns :file :line :column :doc :author :test :name})
 
-(defn- tags [var]
+(defn tags [var]
   (let [var-meta (-> var meta)
         ns-meta (-> var-meta :ns meta)
         full-meta (merge ns-meta var-meta)

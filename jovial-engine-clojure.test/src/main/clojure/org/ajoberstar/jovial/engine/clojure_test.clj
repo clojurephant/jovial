@@ -38,19 +38,53 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Execute support
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def ^:dynamic *throwable* nil)
-(def ^:dynamic *entries* nil)
+(def ^:dynamic *throwables* nil)
+
+(defprotocol TestNode
+  (-fixture [descriptor])
+  (-execute [descriptor]))
+
+(extend-protocol TestNode
+  TestDescriptor
+  (-fixture [_] (fn [f] (f)))
+  (-execute [_] nil)
+
+  ClojureNamespaceDescriptor
+  (-fixture [descriptor] (-> (.getNamespace descriptor) meta ::test/once-fixtures test/join-fixtures))
+  (-execute [_] nil)
+
+  ClojureVarDescriptor
+  (-fixture [descriptor] (-> (.getNamespace descriptor) meta ::test/each-fixtures test/join-fixtures))
+  (-execute [descriptor]
+    (binding [test/*testing-vars* (conj test/*testing-vars* (.getVar descriptor))]
+      (try
+        ((-> descriptor .getVar meta :test))
+        (catch Throwable e
+          (test/do-report {:type :error :message "Uncaught exception, not in assertion." :expected nil :actual e}))))))
+
+(defn- result [errs]
+  (if (seq errs)
+    (let [root (first errs)]
+      (doseq [sup (rest errs)]
+        (.addSuppressed root sup))
+      (TestExecutionResult/failed root))
+    (TestExecutionResult/successful)))
+
+(defn execute-node [descriptor listener]
+  (binding [*throwables* (atom [])]
+    (.executionStarted listener descriptor)
+    (let [fixture (-fixture descriptor)]
+      (try
+        (fixture
+          (fn []
+            (-execute descriptor)
+            (doseq [child (.getChildren descriptor)]
+              (execute-node child listener))))
+        (catch Throwable e
+          (test/do-report {:type :error :message "Uncaught exception, in fixtures." :expected nil :actual e}))))
+    (.executionFinished listener descriptor (result *throwables*))))
 
 (defmulti jovial-report :type)
-
-;; ignore these ones, since we're handling on our own
-(defmethod jovial-report :begin-test-ns [m])
-(defmethod jovial-report :end-test-ns [m])
-(defmethod jovial-report :begin-test-var [m])
-(defmethod jovial-report :end-test-var [m])
-
-;; success doesn't need to be reported
-(defmethod jovial-report :pass [m])
 
 (defmethod jovial-report :fail [m]
   (let [{:keys [message expected actual]}  m
@@ -60,76 +94,28 @@
                 (println (test/testing-contexts-str)))
               (when message
                 (println message))
-              (println "expected: " expected)
-              (println "  actual: " actual))]
-    (reset! *throwable* (AssertionFailedError. msg expected actual))))
+              (println "expected: " (pr-str expected))
+              (println "  actual: " (pr-str actual)))]
+    (swap! *throwables* conj (AssertionFailedError. msg expected actual))))
 
 (defmethod jovial-report :error [m]
-  (let [{:keys [message expected actual]} m
+  (let [{:keys [message expected actual]}  m
         msg (with-out-str
               (println "ERROR in " (test/testing-vars-str m))
               (when (seq test/*testing-contexts*)
                 (println (test/testing-contexts-str)))
               (when message
                 (println message))
-              (println "expected: " expected)
-              (print "  actual: ")
-              (stack/print-cause-trace actual test/*stack-trace-depth*))]
-    (reset! *throwable* (AssertionFailedError. msg actual))))
+              (println "expected: " (pr-str expected)))]
+    (swap! *throwables* conj (AssertionFailedError. msg actual))))
 
-(defmethod jovial-report :default [m]
-  (swap! *entries* conj (ReportEntry/from (dissoc m :type))))
-
-(declare try-execute)
-
-(defprotocol Fixture
-  (-fixture [desc]))
-
-(extend-protocol Fixture
-  Object
-  (-fixture [desc]
-    (fn [f] (f)))
-  ClojureVarDescriptor
-  (-fixture [desc]
-    (-> desc .getNamespace meta ::test/each-fixtures test/join-fixtures))
-  ClojureNamespaceDescriptor
-  (-fixture [desc]
-    (-> desc .getNamespace meta ::test/once-fixtures test/join-fixtures)))
-
-(defprotocol Test
-  (-test [desc listener]))
-
-(extend-protocol Test
-  TestDescriptor
-  (-test [desc listener]
-    (fn []
-      (doseq [child (.getChildren desc)]
-        (try-execute child listener))))
-  ClojureVarDescriptor
-  (-test [desc _]
-    (let [test (-> desc .getVar meta :test)]
-      (fn []
-        (binding [test/*testing-vars* (conj test/*testing-vars* (.getVar desc))]
-          (test))))))
-
-(defn try-execute [descriptor listener]
-  (binding [*throwable* (atom nil)
-            *entries* (atom [])
-            test/report jovial-report]
-    (try
-      (.executionStarted listener descriptor)
-      (let [fixture (-fixture descriptor)
-            test (-test descriptor listener)]
-        (fixture
-          (fn []
-            (test))))
-      (catch Exception e
-        (reset! *throwable* e)))
-    (doseq [entry @*entries*]
-      (.reportingEntryPublished listener descriptor entry))
-    (let [e @*throwable*
-          result (if e (TestExecutionResult/failed e) (TestExecutionResult/successful))]
-      (.executionFinished listener descriptor result))))
+;; ignore these ones, we're managing this directly
+(defmethod jovial-report :begin-test-ns [m])
+(defmethod jovial-report :end-test-ns [m])
+(defmethod jovial-report :begin-test-var [m])
+(defmethod jovial-report :end-test-var [m])
+(defmethod jovial-report :pass [m])
+(defmethod jovial-report :default [m])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; High-level
@@ -139,7 +125,8 @@
   (-discover [_ root-id candidates]
     (do-discover root-id candidates))
   (-execute [_ descriptor listener]
-    (try-execute descriptor listener)))
+    (binding [test/report jovial-report]
+      (execute-node descriptor listener))))
 
 (defn engine [^ConfigurationParameters config]
   ;; could support config at some point
