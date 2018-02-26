@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"org.ajoberstar.jovial.lang.clojure","l":"BaseClojureEngine"},{"p":"org.ajoberstar.jovial.lang.clojure","l":"NamespaceFilter"},{"p":"org.ajoberstar.jovial.lang.clojure","l":"NamespaceSelector"},{"p":"org.ajoberstar.jovial.lang.clojure.util","l":"SimpleClojure"},{"p":"org.ajoberstar.jovial.lang.clojure","l":"VarSelector"}]
