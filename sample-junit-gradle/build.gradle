@@ -17,13 +17,14 @@ repositories {
           name = 'ajoberstar'
           url = 'https://dl.bintray.com/ajoberstar/maven'
         }
+        mavenLocal()
     }
 }
 
 dependencies {
     compile 'org.clojure:clojure:1.8.0'
     testCompile 'junit:junit:4.12'
-    testRuntime 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.2.0-rc.2'
+    testRuntime 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.2.0'
     testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0'
 }
 

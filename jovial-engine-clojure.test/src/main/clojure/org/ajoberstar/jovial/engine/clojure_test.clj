@@ -82,7 +82,7 @@
               (execute-node child listener))))
         (catch Throwable e
           (test/do-report {:type :error :message "Uncaught exception, in fixtures." :expected nil :actual e}))))
-    (.executionFinished listener descriptor (result *throwables*))))
+    (.executionFinished listener descriptor (result @*throwables*))))
 
 (defmulti jovial-report :type)
 
