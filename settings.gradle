@@ -1,3 +1,5 @@
+rootProject.name = 'jovial'
+
 // language support
 include 'jovial-lang-clojure'
 

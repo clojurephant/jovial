@@ -1,7 +1,7 @@
 # jovial
 
 [![Download](https://api.bintray.com/packages/ajoberstar/maven/jovial/images/download.svg)](https://bintray.com/ajoberstar/maven/jovial/_latestVersion)
-[![Travis](https://img.shields.io/travis/ajoberstar/jovial.svg?style=flat-square)](https://travis-ci.org/ajoberstar/jovial)
+[![CircleCI](https://circleci.com/gh/ajoberstar/jovial.svg?style=svg)](https://circleci.com/gh/ajoberstar/jovial)
 
 ## Why do you care?
 

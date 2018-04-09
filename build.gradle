@@ -1,22 +1,35 @@
 plugins {
-    id 'org.ajoberstar.defaults' version '0.8.3'
+    id 'org.ajoberstar.defaults' version '0.10.0'
     id 'gradle-clojure.clojure' version '0.3.1' apply false
+    // TODO remove when Gradle dependency locking is available
+    id 'nebula.dependency-lock' version '5.0.4' apply false
 }
 
 allprojects {
-    group = 'org.ajoberstar.jovial'
+  apply plugin: 'nebula.dependency-lock'
+  group = 'org.ajoberstar.jovial'
 
-    pluginManager.withPlugin('java') {
-        repositories {
-            jcenter()
-        }
-
-        model {
-            bintray {
-                owner = 'ajoberstar'
-                repo = 'maven'
-                pkg = 'jovial'
-            }
-        }
+  pluginManager.withPlugin('java') {
+    repositories {
+      jcenter()
+      maven {
+        name = 'Clojars'
+        url = 'https://repo.clojars.org/'
+      }
     }
+  }
+  pluginManager.withPlugin('maven-publish') {
+    publishing {
+      repositories {
+        maven {
+          name = 'bintray'
+          url = 'https://api.bintray.com/maven/ajoberstar/maven/jovial/;publish=1'
+          credentials {
+            username = System.env['BINTRAY_USER']
+            password = System.env['BINTRAY_KEY']
+          }
+        }
+      }
+    }
+  }
 }

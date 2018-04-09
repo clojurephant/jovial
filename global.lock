@@ -1,0 +1,105 @@
+{
+    "_global_": {
+        "junit:junit": {
+            "firstLevelTransitive": [
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure"
+            ],
+            "locked": "4.12"
+        },
+        "org.ajoberstar.jovial:jovial-engine-clojure.test": {
+            "project": true
+        },
+        "org.ajoberstar.jovial:jovial-lang-clojure": {
+            "firstLevelTransitive": [
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test"
+            ],
+            "project": true
+        },
+        "org.clojure:clojure": {
+            "firstLevelTransitive": [
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure"
+            ],
+            "locked": "1.9.0"
+        },
+        "org.clojure:tools.namespace": {
+            "firstLevelTransitive": [
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure"
+            ],
+            "locked": "0.3.0-alpha4"
+        },
+        "org.junit.platform:junit-platform-engine": {
+            "firstLevelTransitive": [
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure"
+            ],
+            "locked": "1.1.0"
+        },
+        "org.junit.platform:junit-platform-launcher": {
+            "firstLevelTransitive": [
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test"
+            ],
+            "locked": "1.1.0"
+        },
+        "proto-repl:proto-repl": {
+            "firstLevelTransitive": [
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-engine-clojure.test",
+                "org.ajoberstar.jovial:jovial-lang-clojure",
+                "org.ajoberstar.jovial:jovial-lang-clojure"
+            ],
+            "locked": "0.2.1"
+        }
+    }
+}
