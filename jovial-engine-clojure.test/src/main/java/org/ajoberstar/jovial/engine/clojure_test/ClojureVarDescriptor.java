@@ -1,8 +1,9 @@
 package org.ajoberstar.jovial.engine.clojure_test;
 
+import java.util.Set;
+
 import clojure.lang.Namespace;
 import clojure.lang.Var;
-import java.util.Set;
 import org.ajoberstar.jovial.lang.clojure.util.SimpleClojure;
 import org.junit.platform.engine.TestDescriptor.Type;
 import org.junit.platform.engine.TestTag;
