@@ -6,7 +6,7 @@ defaults: &defaults
     - checkout
     - restore_cache:
         keys:
-          - v1-gradle-caches-{{ checksum "global.lock" }}
+          - &cache v2-gradle-caches-{{ checksum "jovial-engine-clojure.test/gradle/dependency-locks/runtimeClasspath.lockfile" }}"
     - attach_workspace:
         at: '.'
     - run:
@@ -15,7 +15,7 @@ defaults: &defaults
     - save_cache:
         paths:
           - '~/.gradle/caches'
-        key: v1-gradle-caches-{{ checksum "global.lock" }}
+        key: *cache
     - store_test_results:
         path: '~/gradle-test-results'
         when: always
@@ -44,7 +44,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-gradle-caches-{{ checksum "global.lock" }}
+            - *cache
       - run:
           name: Update locks
           command: ./gradlew generateGlobalLock saveGlobalLock
@@ -77,7 +77,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-gradle-caches-{{ checksum "global.lock" }}
+            - *cache
       - run:
           name: Publish Artifacts
           command: ./gradlew publish
