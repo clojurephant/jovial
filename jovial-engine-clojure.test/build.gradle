@@ -4,15 +4,18 @@ plugins {
 }
 
 dependencies {
-    compile 'org.junit.platform:junit-platform-engine:1.1.0'
-    compile 'org.clojure:clojure:1.9.0'
+    compile 'org.junit.platform:junit-platform-engine:latest.release'
+    compile 'org.clojure:clojure:1.8.0'
     compile project(':jovial-lang-clojure')
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.1.0'
+    testCompile 'junit:junit:latest.release'
+    testCompile 'org.junit.platform:junit-platform-launcher:latest.release'
 }
 
 test {
     classpath += files('src/test/samples')
     systemProperty "classpath.roots", file('src/test/samples')
+    testLogging {
+        events 'passed', 'failed'
+    }
 }

@@ -4,9 +4,9 @@ plugins {
 }
 
 dependencies {
-    compile 'org.junit.platform:junit-platform-engine:1.1.0'
-    compile 'org.clojure:clojure:1.9.0'
-    compile 'org.clojure:tools.namespace:0.2.11'
+    compile 'org.junit.platform:junit-platform-engine:latest.release'
+    compile 'org.clojure:clojure:1.8.0'
+    compile 'org.clojure:tools.namespace:0.3.0-alpha4'
 
-    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:latest.release'
 }
