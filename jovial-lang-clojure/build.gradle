@@ -1,12 +1,12 @@
 plugins {
-    id 'java'
-    id 'gradle-clojure.clojure'
+  id 'java-library'
+  id 'gradle-clojure.clojure'
 }
 
 dependencies {
-    compile 'org.junit.platform:junit-platform-engine:latest.release'
-    compile 'org.clojure:clojure:1.8.0'
-    compile 'org.clojure:tools.namespace:0.3.0-alpha4'
+  implementation 'org.junit.platform:junit-platform-engine:latest.release'
+  implementation 'org.clojure:clojure:1.8.0'
+  implementation 'org.clojure:tools.namespace:0.3.0-alpha4'
 
-    testCompile 'junit:junit:latest.release'
+  testImplementation 'junit:junit:latest.release'
 }
