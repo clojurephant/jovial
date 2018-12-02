@@ -41,14 +41,6 @@ jobs:
     <<: *defaults
     docker:
       - image: ajoberstar/circleci-openjdk-gradle:8-jdk
-  build-java-9:
-    <<: *defaults
-    docker:
-      - image: ajoberstar/circleci-openjdk-gradle:9-jdk
-  build-java-10:
-    <<: *defaults
-    docker:
-      - image: ajoberstar/circleci-openjdk-gradle:10-jdk
   build-java-11:
     <<: *defaults
     docker:
@@ -73,14 +65,6 @@ workflows:
     jobs:
       - build-java-8:
           <<: *branches-and-tags
-      - build-java-9:
-          <<: *branches-and-tags
-          requires:
-            - build-java-8
-      - build-java-10:
-          <<: *branches-and-tags
-          requires:
-            - build-java-8
       - build-java-11:
           <<: *branches-and-tags
           requires:
@@ -89,7 +73,5 @@ workflows:
           <<: *tags-only
           requires:
             - build-java-8
-            - build-java-9
-            - build-java-10
             - build-java-11
           context: ajoberstar
