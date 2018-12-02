@@ -1,7 +1,4 @@
 rootProject.name = 'jovial'
 
-// language support
-include 'jovial-lang-clojure'
-
 // test engines
 include 'jovial-engine-clojure.test'

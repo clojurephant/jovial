@@ -5,9 +5,8 @@ plugins {
 
 dependencies {
   implementation 'org.junit.platform:junit-platform-engine:latest.release'
-  implementation 'org.clojure:clojure:1.8.0'
-  implementation project(':jovial-lang-clojure')
-  implementation 'org.clojure:tools.namespace:0.3.0-alpha4'
+  implementation 'org.clojure:clojure:latest.release'
+  implementation 'org.clojure:tools.namespace:latest.release'
 
   testImplementation 'junit:junit:latest.release'
   testImplementation 'org.junit.platform:junit-platform-launcher:latest.release'
