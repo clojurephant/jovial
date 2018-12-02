@@ -1,12 +1,21 @@
 plugins {
-    id 'org.ajoberstar.defaults' version '0.13.0'
-    id 'gradle-clojure.clojure' version '0.4.0' apply false
+  id 'org.ajoberstar.grgit' version '3.0.0'
+  id 'org.ajoberstar.reckon' version '0.9.0'
+  id 'com.diffplug.gradle.spotless' version '3.16.0'
+  id 'gradle-clojure.clojure' version '0.5.0-alpha.1' apply false
 }
 
 apply from: 'gradle/locking.gradle'
 apply from: 'gradle/bintray.gradle'
 
+reckon {
+  scopeFromProp()
+  stageFromProp('beta', 'rc', 'final')
+}
+
 allprojects {
+  apply plugin: 'com.diffplug.gradle.spotless'
+
   group = 'org.ajoberstar.jovial'
 
   pluginManager.withPlugin('java') {
@@ -15,6 +24,18 @@ allprojects {
       maven {
         name = 'Clojars'
         url = 'https://repo.clojars.org/'
+      }
+    }
+
+    spotless {
+      java {
+        importOrder 'java', 'javax', ''
+        removeUnusedImports()
+        eclipse().configFile(project.rootProject.file('gradle/eclipse-java-formatter.xml'))
+      }
+      groovyGradle {
+        target '**/*.gradle'
+        greclipse().configFile(project.rootProject.file('gradle/eclipse-java-formatter.xml'))
       }
     }
   }
