@@ -1,12 +1,10 @@
 (ns org.ajoberstar.jovial.engine.clojure-test
   (:require [org.ajoberstar.jovial.lang.clojure :as lang]
             [org.ajoberstar.jovial.lang.clojure.engine :as engine]
-            [clojure.test :as test]
-            [clojure.stacktrace :as stack])
+            [clojure.test :as test])
   (:import (org.ajoberstar.jovial.engine.clojure_test ClojureTestEngine ClojureNamespaceDescriptor ClojureVarDescriptor)
            (org.opentest4j AssertionFailedError)
-           (org.junit.platform.engine TestTag TestDescriptor TestExecutionResult ConfigurationParameters)
-           (org.junit.platform.engine.reporting ReportEntry)
+           (org.junit.platform.engine TestDescriptor TestExecutionResult ConfigurationParameters)
            (org.junit.platform.engine.support.descriptor EngineDescriptor)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -76,10 +74,10 @@
     (let [fixture (-fixture descriptor)]
       (try
         (fixture
-          (fn []
-            (-execute descriptor)
-            (doseq [child (.getChildren descriptor)]
-              (execute-node child listener))))
+         (fn []
+           (-execute descriptor)
+           (doseq [child (.getChildren descriptor)]
+             (execute-node child listener))))
         (catch Throwable e
           (test/do-report {:type :error :message "Uncaught exception, in fixtures." :expected nil :actual e}))))
     (.executionFinished listener descriptor (result @*throwables*))))

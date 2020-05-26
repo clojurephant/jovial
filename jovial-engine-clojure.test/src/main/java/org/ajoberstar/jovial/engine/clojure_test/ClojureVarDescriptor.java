@@ -5,7 +5,6 @@ import java.util.Set;
 import clojure.lang.Namespace;
 import clojure.lang.Var;
 import org.ajoberstar.jovial.lang.clojure.util.SimpleClojure;
-import org.junit.platform.engine.TestDescriptor.Type;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;

@@ -1,33 +1,28 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
-    }
+plugins {
+    id 'java'
+    id 'dev.clojurephant.clojure' version '0.6.0-alpha.3'
 }
-
-apply plugin: 'java'
-apply plugin: 'org.junit.platform.gradle.plugin'
 
 repositories {
     repositories {
-        jcenter()
         maven {
-          name = 'ajoberstar'
-          url = 'https://dl.bintray.com/ajoberstar/maven'
+            name = 'clojars'
+            url = 'https://repo.clojars.org'
         }
+        jcenter()
         mavenLocal()
     }
 }
 
 dependencies {
-    compile 'org.clojure:clojure:1.8.0'
-    testCompile 'junit:junit:4.12'
-    testRuntime 'org.ajoberstar.jovial:jovial-engine-clojure.test:0.2.0'
-    testRuntime 'org.junit.vintage:junit-vintage-engine:5.1.0'
+    testImplementation 'org.clojure:clojure:latest.release'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:latest.release'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:latest.release'
+    testRuntimeOnly 'org.ajoberstar.jovial:jovial-engine-clojure.test:latest.release'
 }
 
-junitPlatform {
-    version '1.1.0'
+test {
+    useJUnitPlatform()
 }
+
+clojure.builds.test.aotAll()
