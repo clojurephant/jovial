@@ -1,7 +1,7 @@
 # jovial
 
 [![Download](https://api.bintray.com/packages/ajoberstar/maven/jovial/images/download.svg)](https://bintray.com/ajoberstar/maven/jovial/_latestVersion)
-[![CircleCI](https://circleci.com/gh/ajoberstar/jovial.svg?style=svg)](https://circleci.com/gh/ajoberstar/jovial)
+![](https://github.com/ajoberstar/jovial/workflows/.github/workflows/build.yaml/badge.svg)
 
 ## Why do you care?
 
