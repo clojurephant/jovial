@@ -1,10 +1,11 @@
 (ns org.ajoberstar.jovial.engine.clojure-test
+  (:refer-clojure :exclude [descriptor])
   (:require [org.ajoberstar.jovial.lang.clojure :as lang]
             [org.ajoberstar.jovial.lang.clojure.engine :as engine]
             [clojure.test :as test])
   (:import (org.ajoberstar.jovial.engine.clojure_test ClojureTestEngine ClojureNamespaceDescriptor ClojureVarDescriptor)
            (org.opentest4j AssertionFailedError)
-           (org.junit.platform.engine TestDescriptor TestExecutionResult ConfigurationParameters)
+           (org.junit.platform.engine EngineExecutionListener TestDescriptor TestExecutionResult ConfigurationParameters)
            (org.junit.platform.engine.support.descriptor EngineDescriptor)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -62,13 +63,13 @@
 
 (defn- result [errs]
   (if (seq errs)
-    (let [root (first errs)]
+    (let [^Throwable root (first errs)]
       (doseq [sup (rest errs)]
         (.addSuppressed root sup))
       (TestExecutionResult/failed root))
     (TestExecutionResult/successful)))
 
-(defn execute-node [descriptor listener]
+(defn execute-node [^TestDescriptor descriptor ^EngineExecutionListener listener]
   (binding [*throwables* (atom [])]
     (.executionStarted listener descriptor)
     (let [fixture (-fixture descriptor)]

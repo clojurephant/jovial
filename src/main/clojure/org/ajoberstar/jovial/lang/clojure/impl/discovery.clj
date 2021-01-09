@@ -69,7 +69,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Filtering candidates for discovery
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- ns-filter [request candidates]
+(defn- ns-filter [^EngineDiscoveryRequest request candidates]
   (let [filters (.getFiltersByType request NamespaceFilter)
         unified (Filter/composeFilters filters)
         included? (fn [cand] (->> cand :namespace (.apply unified) .included))]

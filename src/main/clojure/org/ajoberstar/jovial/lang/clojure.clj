@@ -2,7 +2,7 @@
   (:require [clojure.java.io :as io])
   (:import (clojure.lang Namespace Var)
            (java.util Optional)
-           (org.junit.platform.engine TestSource TestTag UniqueId)
+           (org.junit.platform.engine TestSource TestTag UniqueId UniqueId$Segment)
            (org.junit.platform.engine.support.descriptor FilePosition FileSource CompositeTestSource)))
 
 
@@ -12,14 +12,14 @@
 (def ^:dynamic *root-id*)
 
 (defprotocol Identifiable
-  (->id [this] "Creates a unique id from this object."))
+  (->id ^UniqueId [this] "Creates a unique id from this object."))
 
 (extend-protocol Identifiable
   nil
   (->id [_] nil)
   Namespace
   (->id [ns]
-    (.append *root-id* "namespace" (str ns)))
+    (.append ^UniqueId *root-id* "namespace" (str ns)))
   Var
   (->id [var]
     (let [ns-id (-> var meta :ns ->id)]
@@ -31,7 +31,7 @@
 (def ^:dynamic *root-dir* nil)
 
 (defrecord ClojureNamespaceSource
-  [namespace]
+           [namespace]
   Object
   (toString [_] (str "ClojureNamespaceSource[namespace = " namespace "]"))
   TestSource)
@@ -40,7 +40,7 @@
   (->ClojureNamespaceSource (str namespace)))
 
 (defrecord ClojureVarSource
-  [namespace name]
+           [namespace name]
   Object
   (toString [_] (str "ClojureVarSource[namespace = " namespace ", name = " name "]"))
   TestSource)
@@ -57,8 +57,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Converting to a ref
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- id->map [id]
-  (let [xf (map (fn [segment] [(keyword (.getType segment)) (.getValue segment)]))]
+(defn- id->map [^UniqueId id]
+  (let [xf (map (fn [^UniqueId$Segment segment] [(keyword (.getType segment)) (.getValue segment)]))]
     (into {} xf (.getSegments id))))
 
 (defprotocol ClojureRef

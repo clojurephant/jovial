@@ -24,6 +24,10 @@ sourceSets.named("test") {
   runtimeClasspath = runtimeClasspath.plus(sampleOutput)
 }
 
+clojure.builds.named("main") {
+  setReflection("fail")
+}
+
 clojure.builds.named("sample") {
   sourceSet.set(sourceSets.named("sample"))
   aotNamespaces.add("sample.other-test")
