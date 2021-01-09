@@ -6,7 +6,7 @@ JUnit Platform engines for Clojure test frameworks
 
 ## Why do you care?
 
-The [JUnit Platform](https://junit.org/junit5/) is a de-factor standard in the Java community. In polyglot projects, there is advantage in running everything through the same test runner.
+The [JUnit Platform](https://junit.org/junit5/) is a de-factor standard in the Java community. In polyglot projects, there is advantage in running everything through the same test runner. Or maybe you'd like to "embrace the host" and utlize JUnit as a key part of the JVM ecosystem.
 
 ## What is it?
 
