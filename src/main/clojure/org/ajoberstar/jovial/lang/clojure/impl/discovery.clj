@@ -43,14 +43,13 @@
   Class
   (-select [clazz]
     (let [clazz-name (.getCanonicalName clazz)
-          ns-path (str "/" (str/replace clazz-name "." "/"))
-          ns-for-class? (fn [ns]
-                          (let [ns-name (-> ns str (str/replace "-" "_"))]
-                            (if (= ns-name clazz-name)
-                              ns)))]
+          ns-name (-> clazz-name
+                      (str/replace "__init" "")
+                      (str/replace "_" "-"))
+          ns-sym (symbol ns-name)]
       (try
-        (load ns-path)
-        (-select (some ns-for-class? (all-ns)))
+        (require ns-sym)
+        (-select (find-ns ns-sym))
         (catch Exception _
           nil))))
   VarSelector

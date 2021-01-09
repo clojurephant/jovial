@@ -4,6 +4,7 @@ import static org.ajoberstar.jovial.lang.clojure.NamespaceFilter.includeNamespac
 import static org.ajoberstar.jovial.lang.clojure.NamespaceSelector.selectNamespace;
 import static org.ajoberstar.jovial.lang.clojure.VarSelector.selectVar;
 import static org.junit.Assert.*;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClasspathRoots;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectUniqueId;
 
@@ -27,12 +28,38 @@ import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 
 public class ClojureTestEngineTest {
   @Test
+  public void selectingByClass() throws ClassNotFoundException {
+    Class<?> clojureClazz = Class.forName("sample.other_test__init");
+
+    EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+      .selectors(selectClass(clojureClazz))
+      .build();
+    UniqueId root = UniqueId.root("sample", "test");
+
+    List<UniqueId> expectedIds = Stream.of(
+      root.append("namespace", "sample.other-test"),
+      root.append("namespace", "sample.other-test").append("name", "my-other-works"),
+      root.append("namespace", "sample.other-test").append("name", "my-other-fails"),
+      root.append("namespace", "sample.other-test").append("name", "my-other-error")
+    ).collect(Collectors.toList());
+
+    TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
+    List<UniqueId> actualIds = descriptor.getDescendants().stream()
+        .map(TestDescriptor::getUniqueId)
+        .collect(Collectors.toList());
+
+    assertEquals(expectedIds, actualIds);
+  }
+
+  @Test
   public void selectingByClasspathDir() {
     Set<Path> roots = Arrays.stream(System.getProperty("classpath.roots").split(File.pathSeparator))
         .map(Paths::get)
         .collect(Collectors.toSet());
 
-    EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request().selectors(selectClasspathRoots(roots)).build();
+    EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+      .selectors(selectClasspathRoots(roots))
+      .build();
     UniqueId root = UniqueId.root("sample", "test");
 
     List<UniqueId> expectedIds = Stream.of(

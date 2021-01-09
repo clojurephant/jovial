@@ -17,6 +17,18 @@ reckon {
   stageFromProp("beta", "rc", "final")
 }
 
+sourceSets.register("sample")
+
+sourceSets.named("test") {
+  val sampleOutput = sourceSets["sample"].getOutput()
+  runtimeClasspath = runtimeClasspath.plus(sampleOutput)
+}
+
+clojure.builds.named("sample") {
+  sourceSet.set(sourceSets.named("sample"))
+  aotNamespaces.add("sample.other-test")
+}
+
 repositories {
   mavenCentral()
   maven {
@@ -32,11 +44,13 @@ dependencies {
 
   testImplementation("junit:junit:latest.release")
   testImplementation("org.junit.platform:junit-platform-launcher:latest.release")
+
+  "sampleImplementation"("org.clojure:clojure:latest.release")
 }
 
 tasks.test {
-  classpath = classpath.plus(files("src/test/samples"))
-  systemProperty("classpath.roots", file("src/test/samples"))
+  classpath = classpath.plus(files("src/sample/clojure"))
+  systemProperty("classpath.roots", file("src/sample/clojure"))
   testLogging {
     events("passed", "failed")
   }
