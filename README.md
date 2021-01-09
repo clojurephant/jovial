@@ -1,7 +1,6 @@
 # jovial
 
-[![Download](https://api.bintray.com/packages/ajoberstar/maven/jovial/images/download.svg)](https://bintray.com/ajoberstar/maven/jovial/_latestVersion)
-![](https://github.com/ajoberstar/jovial/workflows/.github/workflows/build.yaml/badge.svg)
+![CI](https://github.com/ajoberstar/jovial/workflows/CI/badge.svg)
 
 ## Why do you care?
 
