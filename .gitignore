@@ -5,3 +5,7 @@ build/
 # Eclipse
 .project
 .settings/
+
+# Clojure
+.clj-kondo/
+.lsp/
