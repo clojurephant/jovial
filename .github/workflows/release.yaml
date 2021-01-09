@@ -34,6 +34,7 @@ jobs:
         uses: "actions/cache@v2"
         with:
           path: "~/.gradle/caches"
+          key: "gradle-caches-${{ runner.os }}-${{ hashFiles('**/*.lockfile') }}"
       - name: "Gradle publish"
         env:
           CLOJARS_USER: ${{ secrets.CLOJARS_USER }}
