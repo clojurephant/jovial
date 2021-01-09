@@ -1,45 +1,26 @@
 # jovial
 
+JUnit Platform engines for Clojure test frameworks
+
 ![CI](https://github.com/ajoberstar/jovial/workflows/CI/badge.svg)
 
 ## Why do you care?
 
-Wouldn't it be great to have one test launcher to rule them all? One API that tools need to support and that other test frameworks
-could implement, so that neither need to know about the other? [JUnit5](http://junit.org/junit5/)'s launching API has that promise.
-
-All it needs is support from the JVM community to provide:
-
-- Launchers to execute JUnit from new (and the same old) places
-- TestEngines to support new (and the same old) testing frameworks
+The [JUnit Platform](https://junit.org/junit5/) is a de-factor standard in the Java community. In polyglot projects, there is advantage in running everything through the same test runner.
 
 ## What is it?
 
-Jovial's main goal is to help provide launchers and engines to extend the support of JUnit5 to new places.
+A JUnit Platform test engine for Clojure testing frameworks.
 
-### Current Support
-
-#### Engines
+Currently supporting:
 
 - [clojure.test](https://clojure.github.io/clojure/clojure.test-api.html)
-
-#### Launchers
-
-_None_
 
 ## Usage
 
 **NOTE:** *All* jovial modules require Java 8 (or higher).
 
 * [Release Notes](https://github.com/ajoberstar/jovial/releases)
-* [Full Documentation](https://github.com/ajoberstar/jovial/wiki)
-
-### clojure.test
-
-Run JUnit5 through [your favorite method](http://junit.org/junit5/docs/current/user-guide/#running-tests), just make
-sure that you have `org.ajoberstar.jovial:jovial-engine-clojure.test` on the classpath.
-
-See the sample [console](sample-junit-console), [maven](sample-junit-maven), and [gradle](sample-junit-gradle) projects
-for more thorough information.
 
 ## Questions, Bugs, and Features
 
