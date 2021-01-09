@@ -32,16 +32,15 @@ public class ClojureTestEngineTest {
     Class<?> clojureClazz = Class.forName("sample.other_test__init");
 
     EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-      .selectors(selectClass(clojureClazz))
-      .build();
+        .selectors(selectClass(clojureClazz))
+        .build();
     UniqueId root = UniqueId.root("sample", "test");
 
     List<UniqueId> expectedIds = Stream.of(
-      root.append("namespace", "sample.other-test"),
-      root.append("namespace", "sample.other-test").append("name", "my-other-works"),
-      root.append("namespace", "sample.other-test").append("name", "my-other-fails"),
-      root.append("namespace", "sample.other-test").append("name", "my-other-error")
-    ).collect(Collectors.toList());
+        root.append("namespace", "sample.other-test"),
+        root.append("namespace", "sample.other-test").append("name", "my-other-works"),
+        root.append("namespace", "sample.other-test").append("name", "my-other-fails"),
+        root.append("namespace", "sample.other-test").append("name", "my-other-error")).collect(Collectors.toList());
 
     TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
     List<UniqueId> actualIds = descriptor.getDescendants().stream()
@@ -58,8 +57,8 @@ public class ClojureTestEngineTest {
         .collect(Collectors.toSet());
 
     EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-      .selectors(selectClasspathRoots(roots))
-      .build();
+        .selectors(selectClasspathRoots(roots))
+        .build();
     UniqueId root = UniqueId.root("sample", "test");
 
     List<UniqueId> expectedIds = Stream.of(
