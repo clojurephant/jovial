@@ -1,3 +1,0 @@
-#!/bin/bash
-./gradlew :installDist --quiet
-./build/install/sample-junit-console/bin/sample-junit-console $*

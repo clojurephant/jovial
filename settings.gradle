@@ -1,4 +1,0 @@
-rootProject.name = 'jovial'
-
-// test engines
-include 'jovial-engine-clojure.test'
