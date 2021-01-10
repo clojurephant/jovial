@@ -3,8 +3,10 @@
 build/
 
 # Eclipse
+.classpath
 .project
 .settings/
+bin/
 
 # Clojure
 .clj-kondo/
