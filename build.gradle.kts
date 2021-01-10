@@ -17,6 +17,10 @@ reckon {
   stageFromProp("beta", "rc", "final")
 }
 
+java {
+  withSourcesJar()
+}
+
 sourceSets.register("sample")
 
 sourceSets.named("test") {
@@ -64,4 +68,12 @@ tasks.jar {
 tasks.test {
   classpath = classpath.plus(files("src/sample/clojure"))
   systemProperty("classpath.roots", file("src/sample/clojure"))
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("main") {
+      from(components["java"])
+    }
+  }
 }
