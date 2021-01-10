@@ -2,6 +2,7 @@
 
 JUnit Platform engines for Clojure test frameworks
 
+[![Clojars Project](https://img.shields.io/clojars/v/org.ajoberstar/jovial.svg)](https://clojars.org/org.ajoberstar/jovial)
 ![CI](https://github.com/ajoberstar/jovial/workflows/CI/badge.svg)
 
 ## Why do you care?
@@ -16,11 +17,7 @@ Currently supporting:
 
 - [clojure.test](https://clojure.github.io/clojure/clojure.test-api.html)
 
-## Usage
-
-**NOTE:** *All* jovial modules require Java 8 (or higher).
-
-* [Release Notes](https://github.com/ajoberstar/jovial/releases)
+See the [Release Notes](https://github.com/ajoberstar/jovial/releases) for updates.
 
 ## Questions, Bugs, and Features
 
