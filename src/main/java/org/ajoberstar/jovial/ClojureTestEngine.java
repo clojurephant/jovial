@@ -1,6 +1,5 @@
 package org.ajoberstar.jovial;
 
-import org.ajoberstar.jovial.BaseClojureEngine;
 import org.ajoberstar.jovial.util.SimpleClojure;
 import org.junit.platform.engine.ConfigurationParameters;
 

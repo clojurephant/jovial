@@ -4,7 +4,6 @@ import java.util.Set;
 
 import clojure.lang.Namespace;
 import clojure.lang.Var;
-import org.ajoberstar.jovial.util.SimpleClojure;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
