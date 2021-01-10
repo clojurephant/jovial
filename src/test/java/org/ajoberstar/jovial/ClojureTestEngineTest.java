@@ -50,7 +50,7 @@ public class ClojureTestEngineTest {
   }
 
   @Test
-  public void selectingByClasspathDir() {
+  public void selectingByClasspathRoot() {
     Set<Path> roots = Arrays.stream(System.getProperty("classpath.roots").split(File.pathSeparator))
         .map(Paths::get)
         .collect(Collectors.toSet());
@@ -78,10 +78,11 @@ public class ClojureTestEngineTest {
   }
 
   @Test
-  public void selectingByNamespace() {
+  public void selectingByClasspathResource() {
     EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-        .selectors(selectNamespace("sample.other-test"))
+        .selectors(selectClasspathResource("/sample/other_test.clj"))
         .build();
+
     UniqueId root = UniqueId.root("sample", "test");
 
     List<UniqueId> expectedIds = Stream.of(
@@ -99,16 +100,25 @@ public class ClojureTestEngineTest {
     assertEquals(expectedIds, actualIds);
   }
 
-  @Test
-  public void selectingByVar() {
+    @Test
+  public void selectingByFile() {
+      Path rootDir = Arrays.stream(System.getProperty("classpath.roots").split(File.pathSeparator))
+        .map(Paths::get)
+        .findFirst()
+        .get();
+    Path file = rootDir.resolve("sample/other_test.clj");
+
     EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-        .selectors(selectVar("sample.other-test", "my-other-works"))
+        .selectors(selectFile(file.toFile()))
         .build();
     UniqueId root = UniqueId.root("sample", "test");
 
     List<UniqueId> expectedIds = Stream.of(
         root.append("namespace", "sample.other-test"),
-        root.append("namespace", "sample.other-test").append("name", "my-other-works")).collect(Collectors.toList());
+        root.append("namespace", "sample.other-test").append("name", "my-other-works"),
+        root.append("namespace", "sample.other-test").append("name", "my-other-fails"),
+        root.append("namespace", "sample.other-test").append("name", "my-other-error"))
+        .collect(Collectors.toList());
 
     TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
     List<UniqueId> actualIds = descriptor.getDescendants().stream()
@@ -143,32 +153,6 @@ public class ClojureTestEngineTest {
     UniqueId id = UniqueId.root("sample", "test").append("namespace", "sample.other-test");
     EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
         .selectors(selectUniqueId(id))
-        .build();
-    UniqueId root = UniqueId.root("sample", "test");
-
-    List<UniqueId> expectedIds = Stream.of(
-        root.append("namespace", "sample.other-test"),
-        root.append("namespace", "sample.other-test").append("name", "my-other-works"),
-        root.append("namespace", "sample.other-test").append("name", "my-other-fails"),
-        root.append("namespace", "sample.other-test").append("name", "my-other-error")).collect(Collectors.toList());
-
-    TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
-    List<UniqueId> actualIds = descriptor.getDescendants().stream()
-        .map(TestDescriptor::getUniqueId)
-        .collect(Collectors.toList());
-
-    assertEquals(expectedIds, actualIds);
-  }
-
-  @Test
-  public void filteringByNamespace() {
-    Set<Path> roots = Arrays.stream(System.getProperty("classpath.roots").split(File.pathSeparator))
-        .map(Paths::get)
-        .collect(Collectors.toSet());
-
-    EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-        .selectors(selectClasspathRoots(roots))
-        .filters(includeNamespacePattern(".*other.*"))
         .build();
     UniqueId root = UniqueId.root("sample", "test");
 

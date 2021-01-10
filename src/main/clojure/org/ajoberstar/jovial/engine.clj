@@ -51,7 +51,7 @@
 
 (defn all-vars []
   (let [fqsym (fn [namespace]
-                (fn [[sym _]] (symbol (name namespace) (name sym))))
+                (fn [[sym _]] (symbol (name (ns-name namespace)) (name sym))))
         nssyms (fn [namespace]
                  (map (fqsym namespace) (ns-publics namespace)))]
     (into #{} (mapcat nssyms) (all-ns))))
@@ -73,18 +73,21 @@
     "Builds a test descriptor meeting the selector's criteria."))
 
 (extend-protocol Selector
+  nil
+  (-select [_]
+    nil)
   Object
-  (-select [this]
+  (-select [_]
     nil)
 
   UniqueIdSelector
-  (-select [this parent-node]
+  (-select [this]
     (let [{:keys [namespace name]} (id->map (.getUniqueId this))]
       (when (and namespace name)
         (->TestCandidate nil (symbol namespace name)))))
 
   FileSelector
-  (-select [this parent-node]
+  (-select [this]
     (let [path (str (.getPath this))
           source (FileSource/from (.getFile this))]
       (when (or (string/ends-with? path ".clj")
