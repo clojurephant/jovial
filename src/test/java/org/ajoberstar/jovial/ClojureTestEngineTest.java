@@ -1,10 +1,9 @@
-package org.ajoberstar.jovial.engine.clojure_test;
+package org.ajoberstar.jovial;
 
-import static org.ajoberstar.jovial.lang.clojure.NamespaceFilter.includeNamespacePattern;
-import static org.ajoberstar.jovial.lang.clojure.NamespaceSelector.selectNamespace;
-import static org.ajoberstar.jovial.lang.clojure.VarSelector.selectVar;
 import static org.junit.Assert.*;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectFile;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
+import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClasspathResource;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClasspathRoots;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectUniqueId;
 

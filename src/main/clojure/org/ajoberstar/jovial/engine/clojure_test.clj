@@ -4,8 +4,9 @@
             [org.ajoberstar.jovial.engine :as engine])
   (:import [org.ajoberstar.jovial ClojureTestEngine ClojureNamespaceDescriptor ClojureVarDescriptor]
            [org.opentest4j AssertionFailedError]
-           [org.junit.platform.engine EngineExecutionListener TestDescriptor TestExecutionResult ConfigurationParameters]
-           [org.junit.platform.engine.support.descriptor EngineDescriptor]))
+           [org.junit.platform.engine
+            ConfigurationParameters EngineDiscoveryRequest EngineExecutionListener ExecutionRequest
+            TestDescriptor TestExecutionResult UniqueId]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Execute support
@@ -85,12 +86,12 @@
     (swap! *throwables* conj (AssertionFailedError. msg actual))))
 
 ;; ignore these ones, we're managing this directly
-(defmethod jovial-report :begin-test-ns [m])
-(defmethod jovial-report :end-test-ns [m])
-(defmethod jovial-report :begin-test-var [m])
-(defmethod jovial-report :end-test-var [m])
-(defmethod jovial-report :pass [m])
-(defmethod jovial-report :default [m])
+(defmethod jovial-report :begin-test-ns [_])
+(defmethod jovial-report :end-test-ns [_])
+(defmethod jovial-report :begin-test-var [_])
+(defmethod jovial-report :end-test-var [_])
+(defmethod jovial-report :pass [_])
+(defmethod jovial-report :default [_])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; High-level
@@ -101,13 +102,15 @@
 (defrecord Engine [config]
   engine/Engine
   (id [_] ClojureTestEngine/ENGINE_ID)
-  (discover [_ request id]
-    (let [candidates (engine/select request)
+  (discover [this request id]
+    (let [candidates (engine/select request id)
           selected (filter test? candidates)]
-      (engine/selected->descriptor request id selected)))
-  (execute [_ descriptor listener]
-    (binding [test/report jovial-report]
-      (execute-node descriptor listener))))
+      (engine/selections->descriptor this id selected)))
+  (execute [_ request]
+    (let [descriptor (.getRootTestDescriptor ^ExecutionRequest request)
+          listener (.getEngineExecutionListener ^ExecutionRequest request)]
+      (binding [test/report jovial-report]
+        (execute-node descriptor listener)))))
 
 (defn engine [^ConfigurationParameters config]
   (->Engine config))

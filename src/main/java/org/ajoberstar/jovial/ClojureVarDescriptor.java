@@ -1,10 +1,10 @@
-package org.ajoberstar.jovial.engine.clojure_test;
+package org.ajoberstar.jovial;
 
 import java.util.Set;
 
 import clojure.lang.Namespace;
 import clojure.lang.Var;
-import org.ajoberstar.jovial.lang.clojure.util.SimpleClojure;
+import org.ajoberstar.jovial.util.SimpleClojure;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;

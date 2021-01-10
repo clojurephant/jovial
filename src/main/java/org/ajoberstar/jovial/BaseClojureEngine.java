@@ -1,8 +1,8 @@
-package org.ajoberstar.jovial.lang.clojure;
+package org.ajoberstar.jovial;
 
 import java.util.Optional;
 
-import org.ajoberstar.jovial.lang.clojure.util.SimpleClojure;
+import org.ajoberstar.jovial.util.SimpleClojure;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;

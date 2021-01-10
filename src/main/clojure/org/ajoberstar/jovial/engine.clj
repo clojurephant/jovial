@@ -2,9 +2,10 @@
   (:refer-clojure :exclude [descriptor])
   (:require [clojure.set :as set]
             [clojure.string :as string])
-  (:import [org.junit.platform.engine
+  (:import [org.ajoberstar.jovial ClojureNamespaceDescriptor ClojureVarDescriptor]
+           [org.junit.platform.engine
             DiscoverySelector EngineDiscoveryRequest ExecutionRequest
-            SelectorResolutionResult UniqueId UniqueId$Segment]
+            SelectorResolutionResult TestTag UniqueId UniqueId$Segment]
            [org.junit.platform.engine.discovery
             UniqueIdSelector DirectorySelector FileSelector
             ClasspathResourceSelector ClasspathRootSelector ClassSelector]
@@ -23,7 +24,7 @@
     "Executes the tests in the request's descriptor and reports results to the request's listener."))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Tag creation
+;; Utilities
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (def ^:private excluded-tags #{:ns :file :line :column :doc :author :test :name})
 
@@ -38,29 +39,10 @@
                  (map #(TestTag/create %)))]
     (into #{} xf full-meta)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; UniqueId creation
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def ^:dynamic *root-id*)
-
 (defn- id->map [^UniqueId id]
   (let [xf (map (fn [^UniqueId$Segment segment]
                   [(keyword (.getType segment)) (.getValue segment)]))]
     (into {} xf (.getSegments id))))
-
-(defprotocol Identifiable
-  (->id ^UniqueId [this] "Creates a unique id from this object."))
-
-(extend-protocol Identifiable
-  nil
-  (->id [_] nil)
-  Namespace
-  (->id [ns]
-    (.append ^UniqueId *root-id* "namespace" (str ns)))
-  Var
-  (->id [var]
-    (let [ns-id (-> var meta :ns ->id)]
-      (.append ns-id "name" (-> var meta :name name)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Discovery Selector Support
@@ -123,7 +105,7 @@
   ClassSelector
   (-select [this]
     (let [name (.getClassName this)
-          ns-name (-> clazz-name
+          ns-name (-> name
                       (string/replace "__init" "")
                       (string/replace "_" "-"))
           ns-sym (symbol ns-name)
@@ -142,40 +124,53 @@
       (loop [result []
              head (first selectors)
              tail (rest selectors)]
-        (try
-          (let [candidates (-select head)]
-            (if candidates
-              (.selectorProcessed listener id head (SelectorResolutionResult/resolved))
-              (.selectorProcessed listener id head (SelectorResolutionResult/unresolved)))
-            (if tail
-              (recur (concat result candidates) (first tail) (rest tail))
-              (concat result candidates)))
-          (catch Exception e
-            (.selectorProcessed listener id head (SelectorResolutionResult/failed e))))))))
+        (let [candidates (try
+                           (-select head)
+                           (catch Exception e
+                             (.selectorProcessed listener id head (SelectorResolutionResult/failed e))
+                             :failed))]
+          ;; notify listener of result
+          (cond
+            (= :failed candidates)
+            nil
+
+            (some? candidates)
+
+            (.selectorProcessed listener id head (SelectorResolutionResult/resolved))
+
+            :else
+            (.selectorProcessed listener id head (SelectorResolutionResult/unresolved)))
+
+          ;; continue with remaining selectors
+          (if tail
+            (recur (concat result candidates) (first tail) (rest tail))
+            (concat result candidates)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Discovery Descriptor Support
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- var->descriptor [{:keys [var]}]
-  (ClojureVarDescriptor. (lang/->id var) var))
+(defn- var->descriptor [^UniqueId parent-id {:keys [source sym]}]
+  (let [var-id (.append parent-id "name" (name sym))
+        var (find-var sym)]
+    (ClojureVarDescriptor. var-id var source (tags var))))
 
-(defn- ns->descriptor [[ns candidates]]
-  (let [ns-desc (ClojureNamespaceDescriptor. (lang/->id ns) ns)]
-    (doseq [var-desc (map var->descriptor candidates)]
+(defn- ns->descriptor [^UniqueId parent-id [ns-sym candidates]]
+  (let [ns-id (.append parent-id "namespace" (name ns-sym))
+        source (->> candidates
+                    (group-by :source)
+                    (apply max-key second)
+                    first)
+        ns (find-ns ns-sym)
+        ns-desc (ClojureNamespaceDescriptor. ns-id ns source (tags ns))]
+    (doseq [var-desc (map #(var->descriptor ns-id %) candidates)]
       (.addChild ns-desc var-desc))
     ns-desc))
 
-(defn- do-discover [root-id candidates]
-  (binding [lang/*root-id* root-id]
-    (let [engine-desc (EngineDescriptor. root-id ClojureTestEngine/ENGINE_ID)
-          ns-descs (->> candidates
-                        (filter test?)
-                        (group-by :namespace)
-                        (map ns->descriptor))]
-      (doseq [ns-desc ns-descs]
-        (.addChild engine-desc ns-desc))
-      engine-desc)))
-
-(defn selections->descriptor [engine ^EngineDiscoveryRequest request ^UniqueId id candidates]
-  (let [root-descriptor (EngineDescriptor. id (id engine))]))
-;; TODO continue from here
+(defn selections->descriptor [engine ^UniqueId id candidates]
+  (let [engine-desc (EngineDescriptor. id (id engine))
+        ns-descs (->> candidates
+                      (group-by (comp namespace :sym))
+                      (map #(ns->descriptor id %)))]
+    (doseq [ns-desc ns-descs]
+      (.addChild engine-desc ns-desc))
+    engine-desc))
