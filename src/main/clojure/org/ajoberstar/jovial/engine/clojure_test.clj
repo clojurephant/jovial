@@ -5,8 +5,8 @@
   (:import [org.ajoberstar.jovial ClojureTestEngine ClojureNamespaceDescriptor ClojureVarDescriptor]
            [org.opentest4j AssertionFailedError]
            [org.junit.platform.engine
-            ConfigurationParameters EngineDiscoveryRequest EngineExecutionListener ExecutionRequest
-            TestDescriptor TestExecutionResult UniqueId]))
+            ConfigurationParameters EngineExecutionListener ExecutionRequest
+            TestDescriptor TestExecutionResult]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Execute support

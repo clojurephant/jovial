@@ -1,13 +1,14 @@
 (ns org.ajoberstar.jovial.engine
   (:refer-clojure :exclude [descriptor])
-  (:require [clojure.set :as set]
+  (:require [clojure.main :as main]
+            [clojure.set :as set]
             [clojure.string :as string])
   (:import [org.ajoberstar.jovial ClojureNamespaceDescriptor ClojureVarDescriptor]
            [org.junit.platform.engine
-            DiscoverySelector EngineDiscoveryRequest ExecutionRequest
+            DiscoverySelector EngineDiscoveryListener EngineDiscoveryRequest ExecutionRequest
             SelectorResolutionResult TestTag UniqueId UniqueId$Segment]
            [org.junit.platform.engine.discovery
-            UniqueIdSelector DirectorySelector FileSelector
+            UniqueIdSelector FileSelector
             ClasspathResourceSelector ClasspathRootSelector ClassSelector]
            [org.junit.platform.engine.support.descriptor
             EngineDescriptor ClasspathResourceSource ClassSource FileSource]))
@@ -65,7 +66,8 @@
       (let [after (reset! *all-vars* (all-vars))
             loaded-vars (set/difference after before)]
         (map #(->TestCandidate source %) loaded-vars))
-      (catch Exception _
+      (catch Exception e
+        (println "Failure loading source" source ": " (-> e Throwable->map main/ex-triage main/ex-str))
         nil))))
 
 (defprotocol Selector
@@ -83,8 +85,11 @@
   (-select [this]
     (let [path (str (.getPath this))
           source (FileSource/from (.getFile this))]
+      (println "File selector path:" path)
+      (println "File selector source:" source)
       (when (or (string/ends-with? path ".clj")
                 (string/ends-with? path ".cljc"))
+        (println "Loading file")
         (select-new-vars source (fn [] (load-file path))))))
 
   ClasspathResourceSelector
@@ -105,6 +110,21 @@
       (when (string/ends-with? name "__init")
         (select-new-vars source (fn [] (require ns-sym)))))))
 
+(defn try-select [^EngineDiscoveryListener listener id selector]
+  (println "Evaluating selector:" selector)
+  (if (satisfies? Selector selector)
+    (try
+      (let [result (-select selector)]
+        (println "Resolved selector:" selector)
+        (.selectorProcessed listener id selector (SelectorResolutionResult/resolved))
+        result)
+      (catch Exception e
+        (println "Failed selector:" selector)
+        (.selectorProcessed listener id selector (SelectorResolutionResult/failed e))))
+    (do
+      (println "Unresolved selector:" selector)
+      (.selectorProcessed listener id selector (SelectorResolutionResult/unresolved)))))
+
 (defn select [^EngineDiscoveryRequest request ^UniqueId id]
   (binding [*all-vars* (atom (all-vars))]
     (let [listener (.getDiscoveryListener request)
@@ -112,16 +132,10 @@
       (loop [result []
              head (first selectors)
              tail (rest selectors)]
-        (if (satisfies? Selector head)
-          (let [candidates (try
-                             (-select head)
-                             (.selectorProcessed listener id head (SelectorResolutionResult/resolved))
-                             (catch Exception e
-                               (.selectorProcessed listener id head (SelectorResolutionResult/failed e))))]
-            (if tail
-              (recur (concat result candidates) (first tail) (rest tail))
-              (concat result candidates)))
-          (.selectorProcessed listener id head (SelectorResolutionResult/unresolved)))))))
+        (let [candidates (try-select listener id head)]
+          (if tail
+            (recur (concat result candidates) (first tail) (rest tail))
+            (concat result candidates)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Discovery Descriptor Support
