@@ -1,7 +1,7 @@
 (ns org.ajoberstar.jovial.lang.clojure.engine
   (:refer-clojure :exclude [descriptor])
   (:require [org.ajoberstar.jovial.lang.clojure.impl.discovery :as discovery])
-  (:import (org.junit.platform.engine EngineDiscoveryRequest UniqueId ExecutionRequest)))
+  (:import [org.junit.platform.engine EngineDiscoveryRequest UniqueId ExecutionRequest]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specification of an Engine

@@ -1,9 +1,9 @@
 (ns org.ajoberstar.jovial.lang.clojure
   (:require [clojure.java.io :as io])
-  (:import (clojure.lang Namespace Var)
-           (java.util Optional)
-           (org.junit.platform.engine TestSource TestTag UniqueId UniqueId$Segment)
-           (org.junit.platform.engine.support.descriptor FilePosition FileSource CompositeTestSource)))
+  (:import [clojure.lang Namespace Var]
+           [java.util Optional]
+           [org.junit.platform.engine TestSource TestTag UniqueId UniqueId$Segment]
+           [org.junit.platform.engine.support.descriptor FilePosition FileSource CompositeTestSource]))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -78,7 +78,7 @@
   CompositeTestSource
   (->ref [comp-source]
     (let [clojure? (fn [source]
-                     (if (some #(instance? % source) [ClojureVarSource ClojureNamespaceSource])
+                     (when (some #(instance? % source) [ClojureVarSource ClojureNamespaceSource])
                        source))]
       (->> comp-source
            .getSources

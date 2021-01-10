@@ -12,6 +12,13 @@ public abstract class BaseClojureEngine implements TestEngine {
   private static final String ENGINE_NS = "org.ajoberstar.jovial.lang.clojure.engine";
 
   @Override
+  public Optional<String> getGroupId() {
+    return Optional.of("org.ajoberstar");
+  }
+
+  // artifact id and version are supposed to come from the JAR manifest
+
+  @Override
   public TestDescriptor discover(EngineDiscoveryRequest request, UniqueId uniqueId) {
     Object engine = getEngine(request.getConfigurationParameters());
     return (TestDescriptor) SimpleClojure.invoke(ENGINE_NS, "discover", engine, request, uniqueId);

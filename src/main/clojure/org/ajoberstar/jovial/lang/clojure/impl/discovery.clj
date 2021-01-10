@@ -3,18 +3,17 @@
   (:require [org.ajoberstar.jovial.lang.clojure :as lang]
             [clojure.tools.namespace.find :refer [find-namespaces]]
             [clojure.string :as str])
-  (:import (clojure.lang Var Namespace)
-           (java.io File)
-           (java.nio.file Path Paths)
-           (java.net URI)
-           (org.ajoberstar.jovial.lang.clojure VarSelector NamespaceSelector NamespaceFilter)
-           (org.junit.platform.engine UniqueId EngineDiscoveryRequest Filter DiscoverySelector)
-           (org.junit.platform.engine.discovery UniqueIdSelector ClasspathRootSelector ClassSelector)))
+  (:import [clojure.lang Var Namespace]
+           [java.io File]
+           [java.nio.file Path Paths]
+           [java.net URI]
+           [org.junit.platform.engine UniqueId EngineDiscoveryRequest Filter DiscoverySelector]
+           [org.junit.platform.engine.discovery UniqueIdSelector ClasspathRootSelector ClassSelector]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Selecting candidates for discovery
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defrecord TestCandidate [namespace var])
+(defrecord TestCandidate [source namespace var])
 
 (defprotocol Selector
   (-select [this] "Selects a seq of TestCandidates for discovery of tests."))
@@ -52,10 +51,6 @@
         (-select (find-ns ns-sym))
         (catch Exception _
           nil))))
-  VarSelector
-  (-select [selector] (-select (.getVar selector)))
-  NamespaceSelector
-  (-select [selector] (-select (.getNamespace selector)))
   UniqueIdSelector
   (-select [selector] (-select (.getUniqueId selector)))
   ClasspathRootSelector
@@ -69,11 +64,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Filtering candidates for discovery
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- ns-filter [^EngineDiscoveryRequest request candidates]
-  (let [filters (.getFiltersByType request NamespaceFilter)
-        unified (Filter/composeFilters filters)
-        included? (fn [cand] (->> cand :namespace (.apply unified) .included))]
-    (clojure.core/filter included? candidates)))
 
 (defn filter [^EngineDiscoveryRequest request candidates]
   (ns-filter request candidates))

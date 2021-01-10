@@ -52,6 +52,12 @@ dependencies {
   "sampleImplementation"("org.clojure:clojure:latest.release")
 }
 
+tasks.jar {
+  manifest {
+    attributes(mapOf("Implementation-Title" to project.name, "Implementation-Version" to project.version))
+  }
+}
+
 tasks.test {
   classpath = classpath.plus(files("src/sample/clojure"))
   systemProperty("classpath.roots", file("src/sample/clojure"))

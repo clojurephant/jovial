@@ -13,10 +13,10 @@ public final class ClojureVarDescriptor extends AbstractTestDescriptor {
   private final Var var;
   private final Set<TestTag> tags;
 
-  public ClojureVarDescriptor(UniqueId id, Var var) {
-    super(id, var.sym.getName(), SimpleClojure.invoke("org.ajoberstar.jovial.lang.clojure", "var-source", var));
+  public ClojureVarDescriptor(UniqueId id, Var var, TestSoure source, Set<TestTag> tags) {
+    super(id, var.sym.getName(), source);
     this.var = var;
-    this.tags = SimpleClojure.invoke("org.ajoberstar.jovial.lang.clojure", "tags", var);
+    this.tags = tags;
   }
 
   public Var getVar() {
