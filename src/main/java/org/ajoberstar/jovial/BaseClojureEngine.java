@@ -1,5 +1,7 @@
 package org.ajoberstar.jovial.lang.clojure;
 
+import java.util.Optional;
+
 import org.ajoberstar.jovial.lang.clojure.util.SimpleClojure;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineDiscoveryRequest;
@@ -9,7 +11,7 @@ import org.junit.platform.engine.TestEngine;
 import org.junit.platform.engine.UniqueId;
 
 public abstract class BaseClojureEngine implements TestEngine {
-  private static final String ENGINE_NS = "org.ajoberstar.jovial.lang.clojure.engine";
+  private static final String ENGINE_NS = "org.ajoberstar.jovial.engine";
 
   @Override
   public Optional<String> getGroupId() {

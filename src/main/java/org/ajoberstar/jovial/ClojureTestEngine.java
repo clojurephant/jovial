@@ -5,7 +5,7 @@ import org.ajoberstar.jovial.lang.clojure.util.SimpleClojure;
 import org.junit.platform.engine.ConfigurationParameters;
 
 public class ClojureTestEngine extends BaseClojureEngine {
-  public static final String ENGINE_ID = "clojure.test";
+  public static final String ENGINE_ID = "org.ajoberstar.jovial.clojure-test";
 
   @Override
   public String getId() {

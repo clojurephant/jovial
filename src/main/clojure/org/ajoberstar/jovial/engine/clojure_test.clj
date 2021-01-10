@@ -1,38 +1,11 @@
 (ns org.ajoberstar.jovial.engine.clojure-test
   (:refer-clojure :exclude [descriptor])
-  (:require [org.ajoberstar.jovial.lang.clojure :as lang]
-            [org.ajoberstar.jovial.lang.clojure.engine :as engine]
-            [clojure.test :as test])
-  (:import [org.ajoberstar.jovial.engine.clojure_test ClojureTestEngine ClojureNamespaceDescriptor ClojureVarDescriptor]
+  (:require [clojure.test :as test]
+            [org.ajoberstar.jovial.engine :as engine])
+  (:import [org.ajoberstar.jovial ClojureTestEngine ClojureNamespaceDescriptor ClojureVarDescriptor]
            [org.opentest4j AssertionFailedError]
            [org.junit.platform.engine EngineExecutionListener TestDescriptor TestExecutionResult ConfigurationParameters]
            [org.junit.platform.engine.support.descriptor EngineDescriptor]))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Discover support
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- test? [cand]
-  (-> cand :var meta :test))
-
-(defn- var->descriptor [{:keys [var]}]
-  (ClojureVarDescriptor. (lang/->id var) var))
-
-(defn- ns->descriptor [[ns candidates]]
-  (let [ns-desc (ClojureNamespaceDescriptor. (lang/->id ns) ns)]
-    (doseq [var-desc (map var->descriptor candidates)]
-      (.addChild ns-desc var-desc))
-    ns-desc))
-
-(defn- do-discover [root-id candidates]
-  (binding [lang/*root-id* root-id]
-    (let [engine-desc (EngineDescriptor. root-id ClojureTestEngine/ENGINE_ID)
-          ns-descs (->> candidates
-                        (filter test?)
-                        (group-by :namespace)
-                        (map ns->descriptor))]
-      (doseq [ns-desc ns-descs]
-        (.addChild engine-desc ns-desc))
-      engine-desc)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Execute support
@@ -83,6 +56,9 @@
           (test/do-report {:type :error :message "Uncaught exception, in fixtures." :expected nil :actual e}))))
     (.executionFinished listener descriptor (result @*throwables*))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Reporter
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defmulti jovial-report :type)
 
 (defmethod jovial-report :fail [m]
@@ -119,14 +95,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; High-level
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defrecord Engine []
+(defn- test? [cand]
+  (-> cand :sym requiring-resolve meta :test))
+
+(defrecord Engine [config]
   engine/Engine
-  (-discover [_ root-id candidates]
-    (do-discover root-id candidates))
-  (-execute [_ descriptor listener]
+  (id [_] ClojureTestEngine/ENGINE_ID)
+  (discover [_ request id]
+    (let [candidates (engine/select request)
+          selected (filter test? candidates)]
+      (engine/selected->descriptor request id selected)))
+  (execute [_ descriptor listener]
     (binding [test/report jovial-report]
       (execute-node descriptor listener))))
 
 (defn engine [^ConfigurationParameters config]
-  ;; could support config at some point
-  (->Engine))
+  (->Engine config))

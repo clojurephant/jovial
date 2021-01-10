@@ -3,33 +3,29 @@ package org.ajoberstar.jovial.engine.clojure_test;
 import java.util.Set;
 
 import clojure.lang.Namespace;
-import clojure.lang.Var;
 import org.ajoberstar.jovial.lang.clojure.util.SimpleClojure;
+import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
 
-public final class ClojureVarDescriptor extends AbstractTestDescriptor {
-  private final Var var;
+public class ClojureNamespaceDescriptor extends AbstractTestDescriptor {
+  private final Namespace ns;
   private final Set<TestTag> tags;
 
-  public ClojureVarDescriptor(UniqueId id, Var var, TestSoure source, Set<TestTag> tags) {
-    super(id, var.sym.getName(), source);
-    this.var = var;
+  public ClojureNamespaceDescriptor(UniqueId id, Namespace ns, TestSource source, Set<TestTag> tags) {
+    super(id, ns.toString(), source);
+    this.ns = ns;
     this.tags = tags;
   }
 
-  public Var getVar() {
-    return var;
-  }
-
   public Namespace getNamespace() {
-    return var.ns;
+    return ns;
   }
 
   @Override
   public Type getType() {
-    return Type.TEST;
+    return Type.CONTAINER;
   }
 
   @Override
