@@ -1,17 +1,21 @@
 (ns org.ajoberstar.jovial.engine
   (:refer-clojure :exclude [descriptor])
-  (:require [clojure.main :as main]
-            [clojure.set :as set]
-            [clojure.string :as string])
-  (:import [org.ajoberstar.jovial ClojureNamespaceDescriptor ClojureVarDescriptor]
+  (:require [clojure.java.io :as io]
+            [clojure.main :as main]
+            [clojure.string :as string]
+            [clojure.tools.namespace.file :as ns-file]
+            [clojure.tools.namespace.find :as ns-find]
+            [clojure.tools.namespace.parse :as ns-parse])
+  (:import [java.io File]
+           [java.nio.file Paths]
+           [org.ajoberstar.jovial ClojureNamespaceDescriptor ClojureVarDescriptor]
            [org.junit.platform.engine
             DiscoverySelector EngineDiscoveryListener EngineDiscoveryRequest ExecutionRequest
             SelectorResolutionResult TestTag UniqueId UniqueId$Segment]
            [org.junit.platform.engine.discovery
-            UniqueIdSelector FileSelector
-            ClasspathResourceSelector ClasspathRootSelector ClassSelector]
+            ClasspathResourceSelector ClasspathRootSelector ClassSelector UniqueIdSelector]
            [org.junit.platform.engine.support.descriptor
-            EngineDescriptor ClasspathResourceSource ClassSource FileSource]))
+            EngineDescriptor ClasspathResourceSource ClassSource]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Specification of an Engine
@@ -48,27 +52,21 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Discovery Selector Support
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(def ^:dynamic *all-vars* nil)
-
-(defn all-vars []
-  (let [fqsym (fn [namespace]
-                (fn [[sym _]] (symbol (name (ns-name namespace)) (name sym))))
-        nssyms (fn [namespace]
-                 (map (fqsym namespace) (ns-publics namespace)))]
-    (into #{} (mapcat nssyms) (all-ns))))
-
 (defrecord TestCandidate [source sym])
 
-(defn select-new-vars [source loader]
-  (let [before @*all-vars*]
-    (try
-      (loader)
-      (let [after (reset! *all-vars* (all-vars))
-            loaded-vars (set/difference after before)]
-        (map #(->TestCandidate source %) loaded-vars))
-      (catch Exception e
-        (println "Failure loading source" source ": " (-> e Throwable->map main/ex-triage main/ex-str))
-        nil))))
+(defn ns-vars [ns]
+  (let [ns-str (name (ns-name ns))]
+    (map (fn [[sym _]]
+           (symbol ns-str (name sym)))
+         (ns-publics ns))))
+
+(defn select-new-vars [source ns-sym]
+  (try
+    (require ns-sym)
+    (map #(->TestCandidate source %) (ns-vars (find-ns ns-sym)))
+    (catch Exception e
+      (println "Failure loading source" source ": " (-> e Throwable->map main/ex-triage main/ex-str))
+      nil)))
 
 (defprotocol Selector
   (-select [this]
@@ -77,28 +75,14 @@
 (extend-protocol Selector
   UniqueIdSelector
   (-select [this]
-    (let [{:keys [namespace name]} (id->map (.getUniqueId this))]
-      (when (and namespace name)
-        (->TestCandidate nil (symbol namespace name)))))
+    (let [{:keys [namespace name]} (id->map (.getUniqueId this))
+          ns-sym (symbol namespace)
+          var-sym (when name (symbol namespace name))
+          result (select-new-vars nil ns-sym)]
+      (if var-sym
+        (filter #(= var-sym (:sym %)) result)
+        result)))
 
-  FileSelector
-  (-select [this]
-    (let [path (str (.getPath this))
-          source (FileSource/from (.getFile this))]
-      (println "File selector path:" path)
-      (println "File selector source:" source)
-      (when (or (string/ends-with? path ".clj")
-                (string/ends-with? path ".cljc"))
-        (println "Loading file")
-        (select-new-vars source (fn [] (load-file path))))))
-
-  ClasspathResourceSelector
-  (-select [this]
-    (let [name (.getClasspathResourceName this)
-          source (ClasspathResourceSource/from name)]
-      (when (or (string/ends-with? name ".clj")
-                (string/ends-with? name ".cljc"))
-        (select-new-vars source (fn [] (load name))))))
   ClassSelector
   (-select [this]
     (let [name (.getClassName this)
@@ -108,34 +92,49 @@
           ns-sym (symbol ns-name)
           source (ClassSource/from name)]
       (when (string/ends-with? name "__init")
-        (select-new-vars source (fn [] (require ns-sym)))))))
+        (select-new-vars source ns-sym))))
+
+  ClasspathResourceSelector
+  (-select [this]
+    (let [name (.getClasspathResourceName this)
+          url (io/resource name)
+          ns-decl (ns-file/read-file-ns-decl url)
+          ns-sym (ns-parse/name-from-ns-decl ns-decl)
+          source (ClasspathResourceSource/from name)]
+      (select-new-vars source ns-sym)))
+
+  ClasspathRootSelector
+  (-select [this]
+    (let [uri (.getClasspathRoot this)
+          path (Paths/get uri)]
+      (mapcat (fn [source]
+                (let [ns-decl (ns-file/read-file-ns-decl source)
+                      ns-sym (ns-parse/name-from-ns-decl ns-decl)
+                      rel-path (.relativize path (.toPath ^File source))
+                      source (ClasspathResourceSource/from (str "/" rel-path))]
+                  (select-new-vars source ns-sym)))
+              (ns-find/find-sources-in-dir (.toFile path))))))
 
 (defn try-select [^EngineDiscoveryListener listener id selector]
-  (println "Evaluating selector:" selector)
   (if (satisfies? Selector selector)
     (try
       (let [result (-select selector)]
-        (println "Resolved selector:" selector)
         (.selectorProcessed listener id selector (SelectorResolutionResult/resolved))
         result)
       (catch Exception e
-        (println "Failed selector:" selector)
         (.selectorProcessed listener id selector (SelectorResolutionResult/failed e))))
-    (do
-      (println "Unresolved selector:" selector)
-      (.selectorProcessed listener id selector (SelectorResolutionResult/unresolved)))))
+    (.selectorProcessed listener id selector (SelectorResolutionResult/unresolved))))
 
 (defn select [^EngineDiscoveryRequest request ^UniqueId id]
-  (binding [*all-vars* (atom (all-vars))]
-    (let [listener (.getDiscoveryListener request)
-          selectors (.getSelectorsByType request DiscoverySelector)]
-      (loop [result []
-             head (first selectors)
-             tail (rest selectors)]
-        (let [candidates (try-select listener id head)]
-          (if tail
-            (recur (concat result candidates) (first tail) (rest tail))
-            (concat result candidates)))))))
+  (let [listener (.getDiscoveryListener request)
+        selectors (.getSelectorsByType request DiscoverySelector)]
+    (loop [result []
+           head (first selectors)
+           tail (rest selectors)]
+      (let [candidates (try-select listener id head)]
+        (if (seq tail)
+          (recur (concat result candidates) (first tail) (rest tail))
+          (concat result candidates))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Discovery Descriptor Support
@@ -145,13 +144,13 @@
         var (find-var sym)]
     (ClojureVarDescriptor. var-id var source (tags var))))
 
-(defn- ns->descriptor [^UniqueId parent-id [ns-sym candidates]]
-  (let [ns-id (.append parent-id "namespace" (name ns-sym))
+(defn- ns->descriptor [^UniqueId parent-id [ns-str candidates]]
+  (let [ns-id (.append parent-id "namespace" ns-str)
         source (->> candidates
                     (group-by :source)
                     (apply max-key second)
                     first)
-        ns (find-ns ns-sym)
+        ns (find-ns (symbol ns-str))
         ns-desc (ClojureNamespaceDescriptor. ns-id ns source (tags ns))]
     (doseq [var-desc (map #(var->descriptor ns-id %) candidates)]
       (.addChild ns-desc var-desc))
@@ -161,7 +160,7 @@
   (let [engine-desc (EngineDescriptor. root-id (id engine))
         ns-descs (->> candidates
                       (group-by (comp namespace :sym))
-                      (map #(ns->descriptor id %)))]
+                      (map #(ns->descriptor root-id %)))]
     (doseq [ns-desc ns-descs]
       (.addChild engine-desc ns-desc))
     engine-desc))

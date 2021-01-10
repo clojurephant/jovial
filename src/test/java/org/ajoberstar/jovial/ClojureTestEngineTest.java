@@ -100,34 +100,6 @@ public class ClojureTestEngineTest {
     assertEquals(expectedIds, actualIds);
   }
 
-    @Test
-  public void selectingByFile() {
-      Path rootDir = Arrays.stream(System.getProperty("classpath.roots").split(File.pathSeparator))
-        .map(Paths::get)
-        .findFirst()
-        .get();
-    Path file = rootDir.resolve("sample/other_test.clj");
-
-    EngineDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-        .selectors(selectFile(file.toFile()))
-        .build();
-    UniqueId root = UniqueId.root("sample", "test");
-
-    List<UniqueId> expectedIds = Stream.of(
-        root.append("namespace", "sample.other-test"),
-        root.append("namespace", "sample.other-test").append("name", "my-other-works"),
-        root.append("namespace", "sample.other-test").append("name", "my-other-fails"),
-        root.append("namespace", "sample.other-test").append("name", "my-other-error"))
-        .collect(Collectors.toList());
-
-    TestDescriptor descriptor = new ClojureTestEngine().discover(request, root);
-    List<UniqueId> actualIds = descriptor.getDescendants().stream()
-        .map(TestDescriptor::getUniqueId)
-        .collect(Collectors.toList());
-
-    assertEquals(expectedIds, actualIds);
-  }
-
   @Test
   public void selectingTestByUniqueId() {
     UniqueId id = UniqueId.root("sample", "test").append("namespace", "sample.other-test").append("name", "my-other-works");

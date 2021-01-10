@@ -61,7 +61,4 @@ tasks.jar {
 tasks.test {
   classpath = classpath.plus(files("src/sample/clojure"))
   systemProperty("classpath.roots", file("src/sample/clojure"))
-  testLogging {
-    events("passed", "failed")
-  }
 }
