@@ -73,13 +73,6 @@
     "Builds a test descriptor meeting the selector's criteria."))
 
 (extend-protocol Selector
-  nil
-  (-select [_]
-    nil)
-  Object
-  (-select [_]
-    nil)
-
   UniqueIdSelector
   (-select [this]
     (let [{:keys [namespace name]} (id->map (.getUniqueId this))]
@@ -93,10 +86,6 @@
       (when (or (string/ends-with? path ".clj")
                 (string/ends-with? path ".cljc"))
         (select-new-vars source (fn [] (load-file path))))))
-  DirectorySelector
-  (-select [this]
-    ;; TODO implement
-    nil)
 
   ClasspathResourceSelector
   (-select [this]
@@ -114,11 +103,7 @@
           ns-sym (symbol ns-name)
           source (ClassSource/from name)]
       (when (string/ends-with? name "__init")
-        (select-new-vars source (fn [] (require ns-sym))))))
-  ClasspathRootSelector
-  (-select [this]
-    ;; TODO implement
-    nil))
+        (select-new-vars source (fn [] (require ns-sym)))))))
 
 (defn select [^EngineDiscoveryRequest request ^UniqueId id]
   (binding [*all-vars* (atom (all-vars))]
@@ -127,27 +112,16 @@
       (loop [result []
              head (first selectors)
              tail (rest selectors)]
-        (let [candidates (try
-                           (-select head)
-                           (catch Exception e
-                             (.selectorProcessed listener id head (SelectorResolutionResult/failed e))
-                             :failed))]
-          ;; notify listener of result
-          (cond
-            (= :failed candidates)
-            nil
-
-            (some? candidates)
-
-            (.selectorProcessed listener id head (SelectorResolutionResult/resolved))
-
-            :else
-            (.selectorProcessed listener id head (SelectorResolutionResult/unresolved)))
-
-          ;; continue with remaining selectors
-          (if tail
-            (recur (concat result candidates) (first tail) (rest tail))
-            (concat result candidates)))))))
+        (if (satisfies? Selector head)
+          (let [candidates (try
+                             (-select head)
+                             (.selectorProcessed listener id head (SelectorResolutionResult/resolved))
+                             (catch Exception e
+                               (.selectorProcessed listener id head (SelectorResolutionResult/failed e))))]
+            (if tail
+              (recur (concat result candidates) (first tail) (rest tail))
+              (concat result candidates)))
+          (.selectorProcessed listener id head (SelectorResolutionResult/unresolved)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Discovery Descriptor Support
@@ -169,8 +143,8 @@
       (.addChild ns-desc var-desc))
     ns-desc))
 
-(defn selections->descriptor [engine ^UniqueId id candidates]
-  (let [engine-desc (EngineDescriptor. id (id engine))
+(defn selections->descriptor [engine ^UniqueId root-id candidates]
+  (let [engine-desc (EngineDescriptor. root-id (id engine))
         ns-descs (->> candidates
                       (group-by (comp namespace :sym))
                       (map #(ns->descriptor id %)))]
