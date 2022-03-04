@@ -128,13 +128,7 @@
 (defn select [^EngineDiscoveryRequest request ^UniqueId id]
   (let [listener (.getDiscoveryListener request)
         selectors (.getSelectorsByType request DiscoverySelector)]
-    (loop [result []
-           head (first selectors)
-           tail (rest selectors)]
-      (let [candidates (try-select listener id head)]
-        (if (seq tail)
-          (recur (concat result candidates) (first tail) (rest tail))
-          (concat result candidates))))))
+    (reduce #(into %1 (try-select listener id %2)) [] selectors)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Discovery Descriptor Support
