@@ -1,8 +1,8 @@
-(ns org.ajoberstar.jovial.engine.clojure-test
+(ns dev.clojurephant.jovial.engine.clojure-test
   (:refer-clojure :exclude [descriptor])
   (:require [clojure.test :as test]
-            [org.ajoberstar.jovial.engine :as engine])
-  (:import [org.ajoberstar.jovial ClojureTestEngine ClojureNamespaceDescriptor ClojureVarDescriptor]
+            [dev.clojurephant.jovial.engine :as engine])
+  (:import [dev.clojurephant.jovial ClojureTestEngine ClojureNamespaceDescriptor ClojureVarDescriptor]
            [org.opentest4j AssertionFailedError]
            [org.junit.platform.engine
             ConfigurationParameters EngineExecutionListener ExecutionRequest

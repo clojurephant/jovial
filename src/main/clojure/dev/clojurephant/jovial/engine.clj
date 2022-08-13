@@ -1,4 +1,4 @@
-(ns org.ajoberstar.jovial.engine
+(ns dev.clojurephant.jovial.engine
   (:refer-clojure :exclude [descriptor])
   (:require [clojure.java.io :as io]
             [clojure.main :as main]
@@ -8,7 +8,7 @@
             [clojure.tools.namespace.parse :as ns-parse])
   (:import [java.io File]
            [java.nio.file Paths]
-           [org.ajoberstar.jovial ClojureNamespaceDescriptor ClojureVarDescriptor]
+           [dev.clojurephant.jovial ClojureNamespaceDescriptor ClojureVarDescriptor]
            [org.junit.platform.engine
             DiscoverySelector EngineDiscoveryListener EngineDiscoveryRequest ExecutionRequest
             SelectorResolutionResult TestTag UniqueId UniqueId$Segment]

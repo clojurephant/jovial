@@ -2,8 +2,10 @@
 
 JUnit Platform engines for Clojure test frameworks
 
-[![Clojars Project](https://img.shields.io/clojars/v/org.ajoberstar/jovial.svg)](https://clojars.org/org.ajoberstar/jovial)
-![CI](https://github.com/ajoberstar/jovial/workflows/CI/badge.svg)
+[![Clojars Project](https://img.shields.io/clojars/v/dev.clojurephant/jovial.svg)](https://clojars.org/dev.clojurephant/jovial)
+![CI](https://github.com/clojurephant/jovial/workflows/CI/badge.svg)
+
+**DISCLAIMER:** Before 0.4.0 this was `org.ajoberstar:jovial`. It provides the same functionality, was just a namespacing change.
 
 ## Why do you care?
 

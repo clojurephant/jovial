@@ -1,4 +1,4 @@
-package org.ajoberstar.jovial;
+package dev.clojurephant.jovial;
 
 import static org.junit.Assert.*;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;

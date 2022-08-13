@@ -1,4 +1,4 @@
-package org.ajoberstar.jovial.util;
+package dev.clojurephant.jovial.util;
 
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;

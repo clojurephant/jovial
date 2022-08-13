@@ -1,8 +1,8 @@
-package org.ajoberstar.jovial;
+package dev.clojurephant.jovial;
 
 import java.util.Optional;
 
-import org.ajoberstar.jovial.util.SimpleClojure;
+import dev.clojurephant.jovial.util.SimpleClojure;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineDiscoveryRequest;
 import org.junit.platform.engine.ExecutionRequest;
@@ -11,11 +11,11 @@ import org.junit.platform.engine.TestEngine;
 import org.junit.platform.engine.UniqueId;
 
 public abstract class BaseClojureEngine implements TestEngine {
-  private static final String ENGINE_NS = "org.ajoberstar.jovial.engine";
+  private static final String ENGINE_NS = "dev.clojurephant.jovial.engine";
 
   @Override
   public Optional<String> getGroupId() {
-    return Optional.of("org.ajoberstar");
+    return Optional.of("dev.clojurephant");
   }
 
   // artifact id and version are supposed to come from the JAR manifest
