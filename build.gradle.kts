@@ -10,6 +10,9 @@ group = "dev.clojurephant"
 
 java {
   withSourcesJar()
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(8))
+  }
 }
 
 sourceSets {
