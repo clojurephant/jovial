@@ -3,18 +3,10 @@ plugins {
   id("java-library")
   id("maven-publish")
 
-  id("org.ajoberstar.reckon")
   id("com.diffplug.spotless")
 }
 
 group = "dev.clojurephant"
-
-reckon {
-  setDefaultInferredScope("patch")
-  stages("alpha", "beta", "rc", "final")
-  setScopeCalc(calcScopeFromProp().or(calcScopeFromCommitMessages()))
-  setStageCalc(calcStageFromProp())
-}
 
 java {
   withSourcesJar()
@@ -41,13 +33,13 @@ clojure {
 
 dependencies {
   api("org.junit.platform:junit-platform-engine:latest.release")
-  api("org.clojure:clojure:latest.release")
+  api("org.clojure:clojure:1.11.1")
   api("org.clojure:tools.namespace:latest.release")
 
   testImplementation("junit:junit:latest.release")
   testImplementation("org.junit.platform:junit-platform-launcher:latest.release")
 
-  "sampleImplementation"("org.clojure:clojure:latest.release")
+  "sampleImplementation"("org.clojure:clojure:1.11.1")
 }
 
 tasks.named<Jar>("jar") {
@@ -64,40 +56,16 @@ tasks.named<Test>("test") {
   systemProperty("classpath.roots", file("src/sample/clojure"))
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Linting
-////////////////////////////////////////////////////////////////////////////////
 spotless {
   java {
     importOrder("java", "javax", "")
-    removeUnusedImports()
     eclipse().configFile(project.rootProject.file("gradle/eclipse-java-formatter.xml"))
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Dependency locking
-////////////////////////////////////////////////////////////////////////////////
-sourceSets.configureEach {
-  configurations[compileClasspathConfigurationName].resolutionStrategy.activateDependencyLocking()
-  configurations[runtimeClasspathConfigurationName].resolutionStrategy.activateDependencyLocking()
+dependencyLocking {
+  lockAllConfigurations()
 }
-
-tasks.register("lock") {
-  doFirst {
-    assert(gradle.startParameter.isWriteDependencyLocks())
-  }
-  doLast {
-    sourceSets.all {
-      configurations[compileClasspathConfigurationName].resolve()
-      configurations[runtimeClasspathConfigurationName].resolve()
-    }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Publishing
-////////////////////////////////////////////////////////////////////////////////
 
 publishing {
   repositories {
@@ -116,8 +84,12 @@ publishing {
       from(components["java"])
 
       versionMapping {
-        usage("java-api") { fromResolutionOf("runtimeClasspath") }
-        usage("java-runtime") { fromResolutionResult() }
+        usage("java-api") {
+          fromResolutionOf("runtimeClasspath")
+        }
+        usage("java-runtime") {
+          fromResolutionResult()
+        }
       }
 
       pom {
