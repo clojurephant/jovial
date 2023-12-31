@@ -1,11 +1,21 @@
 pluginManagement {
   plugins {
-    id("dev.clojurephant.clojure") version("0.7.0")
+    id("dev.clojurephant.clojure") version("0.8.0-beta.2")
 
-    id("org.ajoberstar.grgit") version("5.0.0")
-    id("org.ajoberstar.reckon") version("0.16.1")
-    id("com.diffplug.spotless") version("6.9.1")
+    id("org.ajoberstar.reckon.settings") version("0.18.2")
+    id("com.diffplug.spotless") version("6.23.3")
   }
+}
+
+plugins {
+  id("org.ajoberstar.reckon.settings")
+}
+
+extensions.configure<org.ajoberstar.reckon.gradle.ReckonExtension> {
+  setDefaultInferredScope("patch")
+  stages("beta", "rc", "final")
+  setScopeCalc(calcScopeFromProp().or(calcScopeFromCommitMessages()))
+  setStageCalc(calcStageFromProp())
 }
 
 dependencyResolutionManagement {
