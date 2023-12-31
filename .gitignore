@@ -8,6 +8,9 @@ build/
 .settings/
 bin/
 
+# Intellij
+.idea/
+
 # Clojure
 .clj-kondo/
 .lsp/
