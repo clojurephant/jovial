@@ -1,5 +1,8 @@
 # jovial
 
+> [!IMPORTANT]
+> This project is now maintained on [SourceHut](https://git.sr.ht/~ajoberstar/jovial).
+
 JUnit Platform engines for Clojure test frameworks
 
 [![Clojars Project](https://img.shields.io/clojars/v/dev.clojurephant/jovial.svg)](https://clojars.org/dev.clojurephant/jovial)
